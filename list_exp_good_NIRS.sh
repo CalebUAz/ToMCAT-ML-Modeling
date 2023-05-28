@@ -2,8 +2,14 @@
 
 #List all experiments with good NIRS data i.e. with bad channels
 
-# Specify the path to the folder containing the experiment folders
-experiment_folder="/path/to/experiment_folder"
+# Accept experiment folder path from the user
+read -p "Enter the path to the experiment folder: " experiment_folder
+
+# Check if the experiment folder path is valid
+if [ ! -d "$experiment_folder" ]; then
+  echo "Invalid experiment folder path!"
+  exit 1
+fi
 
 # Loop through each experiment folder
 for exp_folder in "$experiment_folder"/exp_*/; do
