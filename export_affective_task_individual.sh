@@ -25,7 +25,7 @@ for exp_dir in "$SRC_DIR"/exp_*; do
         echo "experiment_id: $experiment_id" > "$log_file"
         # Get Team_ID from REDCap file
         team_id=$(csvgrep -c "Experiment_ID" -m "$experiment_id" "$REDCAP_FILE" | csvcut -c "Team_ID" | tail -n +2)
-        echo "Team_ID: $team_id" >> "$log_file"
+        echo "Team_ID:$team_id" >> "$log_file"
         # Loop over animal folders
         for animal_dir in "$exp_dir"/{lion,tiger,leopard}; do
             # Check if directory
@@ -48,7 +48,7 @@ for exp_dir in "$SRC_DIR"/exp_*; do
                     # If new filename is not empty, rename file
                     if [ -n "$new_filename" ]; then
                         mv "$DEST_DIR/${relative_dir%/*}/$animal_name.csv" "$DEST_DIR/${relative_dir%/*}/$new_filename.csv"
-                        echo "$animal_name : $new_filename" >> "$log_file"
+                        echo "$animal_name:$new_filename" >> "$log_file"
                     fi
                 fi
             fi
