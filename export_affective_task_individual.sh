@@ -40,34 +40,34 @@ for exp_dir in "$SRC_DIR"/exp_*; do
             echo "Failed to create log file: $log_file"
             continue
         fi
-        echo "Processing experiment: $experiment_id" | tee -a "$log_file"
+        echo "experiment_id: $experiment_id" | tee -a "$log_file"
         # Get Team_ID from REDCap file
         team_id=$(csvgrep -c "Experiment_ID" -m "$experiment_id" "$REDCAP_FILE" | csvcut -c "Team_ID" | tail -n +2)
-        echo "Team_ID: $team_id" | tee -a "$log_file"
-        # Loop over animal folders
-        for animal_dir in "$exp_dir"/{lion,tiger,leopard}; do
+        echo "Team_ID:$team_id" | tee -a "$log_file"
+        # Loop over imac folders
+        for imac_dir in "$exp_dir"/{lion,tiger,leopard}; do
             # Check if directory
-            if [ -d "$animal_dir" ]; then
-                csv_file="$animal_dir/NIRS_filtered.csv"
+            if [ -d "$imac_dir" ]; then
+                csv_file="$imac_dir/NIRS_filtered.csv"
                 # Check if csv file exists
                 if [ -f "$csv_file" ]; then
                     # Get relative path for directory to maintain the same structure in destination
-                    relative_dir="${animal_dir#$SRC_DIR}"
-                    # Get the animal name from the path
-                    animal_name="${relative_dir##*/}"
-                    # Capitalize the first letter of animal_name
-                    animal_name_capitalized="$(tr '[:lower:]' '[:upper:]' <<< ${animal_name:0:1})${animal_name:1}"
-                    # Create destination directory for animal folders
+                    relative_dir="${imac_dir#$SRC_DIR}"
+                    # Get the imac name from the path
+                    imac_name="${relative_dir##*/}"
+                    # Capitalize the first letter of imac_name
+                    imac_name_capitalized="$(tr '[:lower:]' '[:upper:]' <<< ${imac_name:0:1})${imac_name:1}"
+                    # Create destination directory for imac folders
                     mkdir -p "$DEST_DIR/${relative_dir%/*}"
-                    echo "Filtering CSV file for $animal_name" | tee -a "$log_file"
+                    echo "Filtering CSV file for $imac_name"
                     # Filter csv file
-                    csvgrep -t -c "event_type" -m "affective_task_individual" "$csv_file" > "$DEST_DIR/${relative_dir%/*}/$animal_name.csv"
+                    csvgrep -t -c "event_type" -m "affective_task_individual" "$csv_file" > "$DEST_DIR/${relative_dir%/*}/$imac_name.csv"
                     # Get new filename from REDCap file
-                    new_filename=$(csvgrep -c "Experiment_ID" -m "$experiment_id" "$REDCAP_FILE" | csvcut -c "${animal_name_capitalized}_Subject_ID" | tail -n +2)
+                    new_filename=$(csvgrep -c "Experiment_ID" -m "$experiment_id" "$REDCAP_FILE" | csvcut -c "${imac_name_capitalized}_Subject_ID" | tail -n +2)
                     # If new filename is not empty, rename file
                     if [ -n "$new_filename" ]; then
-                        mv "$DEST_DIR/${relative_dir%/*}/$animal_name.csv" "$DEST_DIR/${relative_dir%/*}/$new_filename.csv"
-                        echo "Renamed $animal_name.csv to $new_filename.csv" | tee -a "$log_file"
+                        mv "$DEST_DIR/${relative_dir%/*}/$imac_name.csv" "$DEST_DIR/${relative_dir%/*}/$new_filename.csv"
+                        echo "$imac_name.csv:$new_filename.csv" | tee -a "$log_file"
                     fi
                 fi
             fi
