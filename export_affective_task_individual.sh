@@ -24,10 +24,12 @@ for exp_dir in "$SRC_DIR"/exp_*; do
                 if [ -f "$csv_file" ]; then
                     # Get relative path for directory to maintain the same structure in destination
                     relative_dir="${animal_dir#$SRC_DIR}"
+                    # Get the animal name from the path
+                    animal_name="${relative_dir##*/}"
                     # Create destination directory
-                    mkdir -p "$DEST_DIR/$relative_dir"
+                    mkdir -p "$DEST_DIR/${relative_dir%/*}"
                     # Filter csv file and export it to the destination directory
-                    csvgrep -t -c "event_type" -m "affective_task_individual" "$csv_file" > "$DEST_DIR/$relative_dir/exported_data.csv"
+                    csvgrep -t -c "event_type" -m "affective_task_individual" "$csv_file" > "$DEST_DIR/${relative_dir%/*}/$animal_name.csv"
                 fi
             fi
         done
