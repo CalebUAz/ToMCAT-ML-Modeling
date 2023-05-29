@@ -22,10 +22,12 @@ for exp_dir in "$SRC_DIR"/exp_*; do
         mkdir -p "$DEST_DIR/$experiment_id"
         # Create a log file in each experiment folder
         log_file="$DEST_DIR/$experiment_id/player_info.log"
-        echo "experiment_id: $experiment_id" > "$log_file"
+        echo "Processing experiment: $experiment_id" > "$log_file"
+        echo "Processing experiment: $experiment_id"
         # Get Team_ID from REDCap file
         team_id=$(csvgrep -c "Experiment_ID" -m "$experiment_id" "$REDCAP_FILE" | csvcut -c "Team_ID" | tail -n +2)
-        echo "Team_ID:$team_id" >> "$log_file"
+        echo "Team_ID: $team_id" >> "$log_file"
+        echo "Team_ID: $team_id"
         # Loop over animal folders
         for animal_dir in "$exp_dir"/{lion,tiger,leopard}; do
             # Check if directory
@@ -41,6 +43,7 @@ for exp_dir in "$SRC_DIR"/exp_*; do
                     animal_name_capitalized="$(tr '[:lower:]' '[:upper:]' <<< ${animal_name:0:1})${animal_name:1}"
                     # Create destination directory for animal folders
                     mkdir -p "$DEST_DIR/${relative_dir%/*}"
+                    echo "Filtering CSV file for $animal_name"
                     # Filter csv file
                     csvgrep -t -c "event_type" -m "affective_task_individual" "$csv_file" > "$DEST_DIR/${relative_dir%/*}/$animal_name.csv"
                     # Get new filename from REDCap file
@@ -48,13 +51,15 @@ for exp_dir in "$SRC_DIR"/exp_*; do
                     # If new filename is not empty, rename file
                     if [ -n "$new_filename" ]; then
                         mv "$DEST_DIR/${relative_dir%/*}/$animal_name.csv" "$DEST_DIR/${relative_dir%/*}/$new_filename.csv"
-                        echo "$animal_name:$new_filename" >> "$log_file"
+                        echo "Renamed $animal_name.csv to $new_filename.csv" >> "$log_file"
+                        echo "Renamed $animal_name.csv to $new_filename.csv"
                     fi
                 fi
             fi
         done
     fi
 done
+
 
 
 
