@@ -14,8 +14,10 @@ def match_files(raw_folder, extracted_folder):
         raw_files = [os.path.join(raw_affective_folder, f) for f in os.listdir(raw_affective_folder) if f.endswith(".csv")]
 
     # Get the list of CSV files in the extracted experiment folder
-    if os.path.isdir(extracted_folder):
-        extracted_files = [os.path.join(extracted_folder, f) for f in os.listdir(extracted_folder) if f.endswith(".csv")]
+    for root, dirs, files in os.walk(extracted_folder):
+        for file in files:
+            if file.endswith(".csv"):
+                extracted_files.append(os.path.join(root, file))
 
     # Match the files
     for raw_file in raw_files:
@@ -30,7 +32,7 @@ def match_files(raw_folder, extracted_folder):
 
     return matched_files
 
-def process_csv(raw_file_path, extracted_file_path):
+def process_csv(raw_file_path, extracted_file_path, output_file_path):
     raw_affective = pd.read_csv(raw_file_path, delimiter=';')
     extracted_affective = pd.read_csv(extracted_file_path)
 
@@ -51,6 +53,9 @@ def process_csv(raw_file_path, extracted_file_path):
                               left_on='unix_time',
                               right_on='time',
                               direction='nearest')
+    # Save the merged_df to a csv file
+    os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+    merged_df.to_csv(output_file_path, index=False)
     
     return merged_df
 
@@ -58,20 +63,39 @@ def main():
     parser = argparse.ArgumentParser(description="Match files between raw and extracted experiment folders.")
     parser.add_argument("--raw-folder", required=True, help="Path to the raw experiment folder")
     parser.add_argument("--extracted-folder", required=True, help="Path to the extracted experiment folder")
+    parser.add_argument("--export-folder", required=True, help="Path to the export folder")
+    
     args = parser.parse_args()
 
     raw_folder_path = args.raw_folder
     extracted_folder_path = args.extracted_folder
+    output_folder_path = args.export_folder
+
+    # Extract the 'exp_*' part from the extracted_folder_path
+    # match = re.search(r'exp_.*', extracted_folder_path)
+    # if match:
+    #     exp_part = match.group(0)
+    # else:
+    #     raise ValueError("The extracted_folder_path doesn't contain an 'exp_*' part")
+
+    # # Append the 'exp_*' part to the output_folder_path
+    # output_folder_path = os.path.join(output_folder_path, exp_part)
 
     # Call the function to match the files
     matched_files = match_files(raw_folder_path, extracted_folder_path)
-    
+
     # Process each matched pair of csv files
     for raw_file, extracted_file in matched_files.items():
         raw_file_path = os.path.join(raw_folder_path, 'baseline_tasks', 'affective', raw_file)
         extracted_file_path = os.path.join(extracted_folder_path, extracted_file)
-        merged_df = process_csv(raw_file_path, extracted_file_path)
-        print(merged_df)
+
+       # Calculate the relative path of the extracted file path to the extracted folder path
+        relative_extracted_path = os.path.relpath(extracted_file_path, start=extracted_folder_path)
+        # Now the relative path can be joined with the output folder path
+        output_file_path = os.path.join(output_folder_path, relative_extracted_path)
+
+        merged_df = process_csv(raw_file_path, extracted_file_path, output_file_path)
+        print(f"Processed and saved file: {output_file_path}")
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,15 @@
 #!/bin/bash
+'''
+This script filters the NIRS data for affective task individual and renames the files according to the REDCap file.
+RedCap file: REDCap_ToMCAT.csv has subject IDs for each imac.
+
+Execution: ./export_affective_task_individual.sh <source_directory> <destination_directory> <REDCap_file>
+<source_directory> is the labeled experiment data directory with filered_NIRS.csv (/space/calebshibu/Neurips_new)
+<destination_directory> is user defined export location /space/calebshibu/
+<REDCap_file> is present in /space/calebshibu/REDCap_ToMCAT.csv
+
+e.g: ./export_affective_task_individual.sh /space/calebshibu/Neurips_new /space/calebshibu/Neurips_new/Affective_Task_Individual /space/calebshibu/REDcap_ToMCAT.csv
+'''
 
 # This script expects three arguments: the source directory, the destination directory, and the REDCap_ToMCAT.csv file.
 
