@@ -44,7 +44,7 @@ execute_python_script() {
     local error_log="$current_export_folder/error_log.txt"
 
     # Call python script and save stderr to error log
-    if ! python3 map_raw_Affective_with_extracted.py --raw-folder "$current_raw_folder" --extracted-folder "$current_extracted_folder" --export-folder "$current_export_folder" 2>> "$error_log"; then
+    if ! python3 map_raw_Affective_with_extracted.py --raw-folder "$current_raw_folder" --extracted-folder "$current_extracted_folder" --export-folder" "$current_export_folder" 2>> "$error_log"; then
         echo "Python script failed for $dir."
     fi
 }
@@ -60,7 +60,7 @@ for dir in "${directories[@]}"; do
     fi
 
     # Print the command before executing
-    echo "Running: python3 map_raw_Affective_with_extracted.py --raw-folder \"${rawdir}/${base_dir}\" --export-folder \"${extracteddir}/${base_dir}\" --output-folder \"${exportdir}/${base_dir}\""
+    echo "Running: python3 map_raw_Affective_with_extracted.py --raw-folder \"${rawdir}/${base_dir}\" --extracted-folder \"${extracteddir}/${base_dir}\" --export-folder" \"${exportdir}/${base_dir}\""
 
     # Start a separate process to execute the Python script
     execute_python_script "$dir" &
