@@ -60,7 +60,7 @@ for dir in "${directories[@]}"; do
     fi
 
     # Print the command before executing
-    echo "Running: python3 map_raw_Affective_with_extracted.py --raw-folder \"${rawdir}/${base_dir}\" --extracted-folder \"${extracteddir}/${base_dir}\" --export-folder" \"${exportdir}/${base_dir}\""
+    echo "Running: python3 map_raw_Affective_with_extracted.py echo "Running: python3 map_raw_Affective_with_extracted.py --raw-folder \"${rawdir}/${base_dir}\" --extracted-folder \"${extracteddir}/${base_dir}\" --export-folder \"${exportdir}/${base_dir}\""
 
     # Start a separate process to execute the Python script
     execute_python_script "$dir" &
