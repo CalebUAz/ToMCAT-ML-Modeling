@@ -1,6 +1,6 @@
 #!/bin/bash
 '''
-This script filters the NIRS data for affective task individual and renames the files according to the REDCap file.
+This script filters out NIRS data as chunks for affective task individual and renames the files according to the REDCap file.
 RedCap file: REDCap_ToMCAT.csv has subject IDs for each imac.
 
 Execution: ./export_affective_task_individual.sh <source_directory> <destination_directory> <REDCap_file>

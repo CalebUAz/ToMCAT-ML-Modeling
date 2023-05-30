@@ -3,6 +3,13 @@ import re
 import argparse
 import pandas as pd
 
+"""
+This script matches the raw affective csv files (/tomcat/data/raw/LangLab/experiments/study_3_pilot/group) with the extracted affective csv files (/space/calebshibu/Neurips_new/Affective_Task_Individual).
+The raw affective csv files are located in the raw experiment folder.
+The extracted affective csv files are located in the extracted experiment folder.
+The matched files are saved in the export folder.
+"""
+
 def match_files(raw_folder, extracted_folder):
     raw_files = []
     extracted_files = []
@@ -72,14 +79,14 @@ def main():
     output_folder_path = args.export_folder
 
     # Extract the 'exp_*' part from the extracted_folder_path
-    # match = re.search(r'exp_.*', extracted_folder_path)
-    # if match:
-    #     exp_part = match.group(0)
-    # else:
-    #     raise ValueError("The extracted_folder_path doesn't contain an 'exp_*' part")
+    match = re.search(r'exp_.*', extracted_folder_path)
+    if match:
+        exp_part = match.group(0)
+    else:
+        raise ValueError("The extracted_folder_path doesn't contain an 'exp_*' part")
 
-    # # Append the 'exp_*' part to the output_folder_path
-    # output_folder_path = os.path.join(output_folder_path, exp_part)
+    # Append the 'exp_*' part to the output_folder_path
+    output_folder_path = os.path.join(output_folder_path, exp_part)
 
     # Call the function to match the files
     matched_files = match_files(raw_folder_path, extracted_folder_path)
