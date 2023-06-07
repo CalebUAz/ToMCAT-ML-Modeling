@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from utils import save_plot_with_timestamp
 
-def classify_LSTM_Affective_Individual_Task_EEG(path):
+def classify_LSTM_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, batch_size, learning_rate):
 
     # Create the output folder if it doesn't exist
     output_folder = 'output'
@@ -44,11 +44,7 @@ def classify_LSTM_Affective_Individual_Task_EEG(path):
 
     # Hyperparameters
     input_size = features.shape[1]
-    hidden_size = 256
     num_classes = 5  # Classes representing -2, -1, 0, 1, 2
-    num_epochs = 2
-    batch_size = 512
-    learning_rate = 0.001
     num_folds = 5
 
     # Create DataLoaders
@@ -174,7 +170,25 @@ if __name__ == "__main__":
     parser.add_argument(
         "--p", required=True, help="Path to the directory with the derived affective task data"
     )
+    parser.add_argument(
+        "--hidden_size", type=int, default=256, help="Hidden size for the LSTM model"
+    )
+    parser.add_argument(
+        "--num_epochs", type=int, default=100, help="Number of epochs for training"
+    )
+    parser.add_argument(
+        "--batch_size", type=int, default=256, help="Batch size for training"
+    )
+    parser.add_argument(
+        "--learning_rate", type=float, default=0.001, help="Learning rate for optimizer"
+    )
 
-    arg = parser.parse_args()
-    path = arg.p
-    sys.exit(classify_LSTM_Affective_Individual_Task_EEG(path))
+    args = parser.parse_args()
+    path = args.p
+    hidden_size = args.hidden_size
+    num_epochs = args.num_epochs
+    batch_size = args.batch_size
+    learning_rate = args.learning_rate
+
+    sys.exit(classify_LSTM_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, batch_size, learning_rate))
+    
