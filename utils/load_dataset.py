@@ -42,6 +42,7 @@ def load_dataset(path):
                         df.drop(columns=['task_image_path', 'task_event_type'], inplace=True)
                         df.columns = [None] * len(df.columns)
                         
+                        df.reset_index(drop=True, inplace=True)
                         # Append the DataFrame to the list
                         dfs.append(df)
 
