@@ -26,15 +26,17 @@ def load_dataset(path):
                     if file.endswith('affective_individual_physio_task.csv'):
                         file_path = os.path.join(folder_path, file)
                         
-                        print(file_path)
-                        
                         df = pd.read_csv(file_path)
                         imac = os.path.basename(file).split('_')[0]
                         df.drop(columns=['unix_time', 'task_time', 'task_monotonic_time', 'task_human_readable_time', 'task_subject_id', 'seconds_since_start', 'human_readable_time', imac, 'task_index', 'experiment_id'], inplace=True)
-                        df.loc[df['task_event_type'] == 'intermediate_selection', ['task_arousal_score', 'task_valence_score']] = np.nan
+                        if 'task_Unnamed: 0' in df.columns:
+                            df.drop(columns='task_Unnamed: 0', inplace=True)
+
+                        df.loc[df['task_event_type'].isin(['intermediate_selection','show_cross_screen', 'show_image', 'show_rating_screen']), ['task_arousal_score', 'task_valence_score']] = np.nan
                         df[['task_image_path', 'task_arousal_score', 'task_valence_score', 'task_event_type']] = df[['task_image_path', 'task_arousal_score', 'task_valence_score', 'task_event_type']].fillna(method='bfill')
-                        df.dropna(inplace=True)
                         df.drop(columns=['task_image_path', 'task_event_type'], inplace=True)
+                        df.dropna(inplace=True)
+                        df.columns = [None] * len(df.columns)
                         dfs.append(df)
 
     combined_df = pd.concat(dfs, ignore_index=True)
