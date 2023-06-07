@@ -23,7 +23,7 @@ def load_dataset(path):
     # Iterate over the directories in the specified path
     for root, dirs, files in os.walk(directory):
         for folder in dirs:
-            if folder.startswith('exp_'):
+            if folder.startswith('exp_') and folder != 'exp_2023_04_18_14': 
                 folder_path = os.path.join(root, folder)
                 
                 # Iterate over the files within the exp_* folder
