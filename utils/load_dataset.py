@@ -43,9 +43,8 @@ def load_dataset(path):
                         df.columns = [None] * len(df.columns)
                         
                         # Append the DataFrame to the list
-                        dfs.append(df.reset_index(drop=True))
+                        dfs.append(df)
 
-                                        
     combined_df = pd.concat(dfs, ignore_index=True) 
     combined_df.set_axis(headers, axis=1)        
 
