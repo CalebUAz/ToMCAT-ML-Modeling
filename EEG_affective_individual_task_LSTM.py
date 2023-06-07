@@ -1,3 +1,4 @@
+import os
 import sys
 import pandas as pd
 import argparse
@@ -16,8 +17,19 @@ from tqdm import tqdm
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
+from utils import save_plot_with_timestamp
 
 def classify_LSTM_Affective_Individual_Task_EEG(path):
+
+    # Create the output folder if it doesn't exist
+    output_folder = 'output'
+    if not os.path.exists(output_folder):
+        try:
+            os.makedirs(output_folder)
+        except OSError as e:
+            print(f"Error creating output folder: {e}")
+            return
+        
     # Load dataset
     merged_df = load_dataset_EEG(path)
 
@@ -34,7 +46,7 @@ def classify_LSTM_Affective_Individual_Task_EEG(path):
     input_size = features.shape[1]
     hidden_size = 256
     num_classes = 5  # Classes representing -2, -1, 0, 1, 2
-    num_epochs = 50
+    num_epochs = 2
     batch_size = 512
     learning_rate = 0.001
     num_folds = 5
@@ -142,18 +154,18 @@ def classify_LSTM_Affective_Individual_Task_EEG(path):
     # Plotting confusion matrix for arousal
     plt.figure(figsize=(10, 7))
     sns.heatmap(arousal_cm, annot=True, fmt='d', xticklabels=class_names, yticklabels=class_names, cmap='Blues')
-    plt.title('Confusion Matrix for Arousal')
+    plt.title(f'EEG: Confusion Matrix for Arousal\nHidden Size: {hidden_size}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}')
     plt.xlabel('Predicted')
     plt.ylabel('True')
-    plt.show()
+    save_plot_with_timestamp(plt, 'confusion_matrix_arousal', output_folder)
 
     # Plotting confusion matrix for valence
     plt.figure(figsize=(10, 7))
     sns.heatmap(valence_cm, annot=True, fmt='d', xticklabels=class_names, yticklabels=class_names, cmap='Blues')
-    plt.title('Confusion Matrix for Valence')
+    plt.title(f'EEG: Confusion Matrix for Valence\nHidden Size: {hidden_size}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}')
     plt.xlabel('Predicted')
     plt.ylabel('True')
-    plt.show()
+    save_plot_with_timestamp(plt, 'confusion_matrix_arousal', output_folder)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
