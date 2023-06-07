@@ -35,9 +35,9 @@ def classify_LSTM_Affective_Individual_Task_EEG(path):
     hidden_size = 256
     num_classes = 5  # Classes representing -2, -1, 0, 1, 2
     num_epochs = 50
-    batch_size = 256
+    batch_size = 512
     learning_rate = 0.001
-    num_folds = 3
+    num_folds = 5
 
     # Create DataLoaders
     dataset = TensorDataset(torch.tensor(features).float().to(device), torch.tensor(targets).long().to(device))
@@ -97,6 +97,7 @@ def classify_LSTM_Affective_Individual_Task_EEG(path):
                 progress_bar.set_postfix(loss=loss.item())
 
         fold_losses.append(loss.item())
+        print(f"Loss for Fold {fold+1}: {fold_losses[-1]}")
 
         # Testing
         model.eval()
@@ -128,6 +129,10 @@ def classify_LSTM_Affective_Individual_Task_EEG(path):
     print("Standard deviation for arousal_score:", np.std(arousal_accuracies))
     print("Average accuracy for valence_score:", np.mean(valence_accuracies))
     print("Standard deviation for valence_score:", np.std(valence_accuracies))
+
+    # Print the average loss per fold.
+    print(f"Average loss per fold: {np.mean(fold_losses)}")
+    print(f"Standard deviation of loss per fold: {np.std(fold_losses)}")
 
     arousal_cm = confusion_matrix(targets_arousal.cpu(), predicted_arousal.cpu())
     valence_cm = confusion_matrix(targets_valence.cpu(), predicted_valence.cpu())
