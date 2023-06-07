@@ -30,6 +30,9 @@ def load_dataset(path):
                 for file in os.listdir(folder_path):
                     if file.endswith('affective_individual_physio_task.csv'):
                         file_path = os.path.join(folder_path, file)
+
+                        print(file_path)
+                        
                         df = pd.read_csv(file_path)
                         imac = os.path.basename(file).split('_')[0]
                         df.drop(columns=['unix_time', 'task_time', 'task_monotonic_time', 'task_human_readable_time', 'task_subject_id', 'seconds_since_start', 'human_readable_time', imac, 'task_index', 'experiment_id'], inplace=True)
@@ -38,9 +41,10 @@ def load_dataset(path):
                         df.dropna(inplace=True)
                         df.drop(columns=['task_image_path', 'task_event_type'], inplace=True)
                         df.columns = [None] * len(df.columns)
-
+                        
                         # Append the DataFrame to the list
                         dfs.append(df)
+
                                         
     combined_df = pd.concat(dfs, ignore_index=True) 
     combined_df.set_axis(headers, axis=1)        
