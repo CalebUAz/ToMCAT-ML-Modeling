@@ -32,16 +32,17 @@ pip install -r requirements.txt
 1. Prepare the dataset: Place your fNIRS dataset file in a directory. Note the path to this directory.
 2. Execute the script by running the following command:
 ```bash
-python3 NIRS_affective_individual_task_LSTM.py --p <path_to_nirs_dataset_directory>
+python3 EEG_affective_individual_task_LSTM.py --p  /tomcat/data/derived/drafts/draft_2023_06_05_11/nirs/ --hidden_size 1024 --num_epochs 25 --batch_size 1024
 ```
 Replace `<path_to_dataset_directory>` with the actual path to the directory containing the fNIRS dataset.
 Example:
 ```bash
-python3 NIRS_affective_individual_task_LSTM.py --p ./data/dataset_directory
+python3 EEG_affective_individual_task_LSTM.py --p  /tomcat/data/derived/drafts/draft_2023_06_05_11/eeg/ --hidden_size 1024 --num_epochs 25 --batch_size 1024
 ```
-3. The script will load the fNIRS affective task  dataset, preprocess the data, train the LSTM model, and evaluate its performance.
-4. After completion, the script will display the average accuracy and standard deviation across folds for arousal and valence scores. It will also print the average loss per fold and the standard deviation of loss per fold.
-5. Additionally, the script will generate confusion matrix plots for arousal and valence scores and save them in the output folder.
+3. If you wish to pass hyperparameters like hidden_size, num_epochs, batch_size, learning_rate, etc, you can do so by sending those values as a flag. 
+4. The script will load the fNIRS affective task  dataset, preprocess the data, train the LSTM model, and evaluate its performance.
+5. After completion, the script will display the average accuracy and standard deviation across folds for arousal and valence scores. It will also print the average loss per fold and the standard deviation of loss per fold.
+6. Additionally, the script will generate confusion matrix plots for arousal and valence scores and save them in the output folder.
 
 ### EEG:
 1. Prepare the dataset: Place your EEG dataset file in a directory. Note the path to this directory.
@@ -54,6 +55,7 @@ Example:
 ```bash
 python3 NIRS_affective_individual_task_LSTM.py --p ./data/dataset_directory
 ```
-3. The script will load the EEG affective task dataset, preprocess the data, train the LSTM model, and evaluate its performance.
-4. After completion, the script will display the average accuracy and standard deviation across folds for arousal and valence scores. It will also print the average loss per fold and the standard deviation of loss per fold.
-5. Additionally, the script will generate confusion matrix plots for arousal and valence scores and save them in the output folder.
+3. If you wish to pass hyperparameters like hidden_size, num_epochs, batch_size, learning_rate, etc, you can do so by sending those values as a flag. 
+4. The script will load the EEG affective task dataset, preprocess the data, train the LSTM model, and evaluate its performance.
+5. After completion, the script will display the average accuracy and standard deviation across folds for arousal and valence scores. It will also print the average loss per fold and the standard deviation of loss per fold.
+6. Additionally, the script will generate confusion matrix plots for arousal and valence scores and save them in the output folder.
