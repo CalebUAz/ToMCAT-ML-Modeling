@@ -49,7 +49,7 @@ python3 NIRS_affective_individual_task_LSTM.py --p ./data/dataset_directory
 ```bash
 python3 EEG_affective_individual_task_LSTM.py --p <path_to_eeg_dataset_directory>
 ```
-Replace `<path_to_dataset_directory>` with the actual path to the directory containing the fNIRS dataset.
+Replace `<path_to_dataset_directory>` with the actual path to the directory containing the EEG dataset.
 Example:
 ```bash
 python3 NIRS_affective_individual_task_LSTM.py --p ./data/dataset_directory
