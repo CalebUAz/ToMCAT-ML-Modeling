@@ -12,7 +12,7 @@ import pandas as pd
 from sklearn.model_selection import KFold
 import matplotlib.pyplot as plt
 from utils import load_dataset
-
+from tqdm import tqdm
 
 def train_LSTM_Affective_Individual_Task(path):
     # Load dataset
@@ -74,7 +74,8 @@ def train_LSTM_Affective_Individual_Task(path):
         # Training
         model.train()
         for epoch in range(num_epochs):
-            for i, (inputs, targets) in enumerate(train_loader):
+            progress_bar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{num_epochs}")
+            for i, (inputs, targets) in enumerate(progress_bar):
                 inputs = inputs.view(-1, 1, input_size)
                 targets_arousal = targets[:, 0]
                 targets_valence = targets[:, 1]
@@ -90,8 +91,7 @@ def train_LSTM_Affective_Individual_Task(path):
                 loss.backward()
                 optimizer.step()
 
-            if (epoch+1) % 10 == 0:
-                print(f'Epoch {epoch+1}/{num_epochs}, Loss: {loss.item()}')
+                progress_bar.set_postfix(loss=loss.item())
 
         fold_losses.append(loss.item())
 
