@@ -2,9 +2,10 @@ import pandas as pd
 import numpy as np
 import os
 
-def load_dataset():
-    directory = '/Users/calebjonesshibu/Desktop/tom/derived/draft_2023_06_05_11/nirs/'
+def load_dataset(path):
+    # directory = '/Users/calebjonesshibu/Desktop/tom/derived/draft_2023_06_05_11/nirs/'
 
+    directory = path
     # Create an empty list to store the DataFrames
     dfs = []
 
@@ -44,4 +45,4 @@ def load_dataset():
     combined_df = pd.concat(dfs, ignore_index=True) 
     combined_df.set_axis(headers, axis=1)        
 
-load_dataset()
+    return combined_df
