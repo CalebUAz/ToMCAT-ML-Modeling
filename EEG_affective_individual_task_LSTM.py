@@ -13,6 +13,9 @@ from sklearn.model_selection import KFold
 import matplotlib.pyplot as plt
 from utils import load_dataset_EEG
 from tqdm import tqdm
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def classify_LSTM_Affective_Individual_Task_EEG(path):
     # Load dataset
@@ -29,12 +32,12 @@ def classify_LSTM_Affective_Individual_Task_EEG(path):
 
     # Hyperparameters
     input_size = features.shape[1]
-    hidden_size = 128
+    hidden_size = 256
     num_classes = 5  # Classes representing -2, -1, 0, 1, 2
-    num_epochs = 1000
-    batch_size = 32
+    num_epochs = 50
+    batch_size = 256
     learning_rate = 0.001
-    num_folds = 5
+    num_folds = 3
 
     # Create DataLoaders
     dataset = TensorDataset(torch.tensor(features).float().to(device), torch.tensor(targets).long().to(device))
@@ -126,6 +129,26 @@ def classify_LSTM_Affective_Individual_Task_EEG(path):
     print("Average accuracy for valence_score:", np.mean(valence_accuracies))
     print("Standard deviation for valence_score:", np.std(valence_accuracies))
 
+    arousal_cm = confusion_matrix(targets_arousal.cpu(), predicted_arousal.cpu())
+    valence_cm = confusion_matrix(targets_valence.cpu(), predicted_valence.cpu())
+    # Define the class names (assuming -2 to 2 for arousal and valence scores)
+    class_names = [-2, -1, 0, 1, 2]
+
+    # Plotting confusion matrix for arousal
+    plt.figure(figsize=(10, 7))
+    sns.heatmap(arousal_cm, annot=True, fmt='d', xticklabels=class_names, yticklabels=class_names, cmap='Blues')
+    plt.title('Confusion Matrix for Arousal')
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.show()
+
+    # Plotting confusion matrix for valence
+    plt.figure(figsize=(10, 7))
+    sns.heatmap(valence_cm, annot=True, fmt='d', xticklabels=class_names, yticklabels=class_names, cmap='Blues')
+    plt.title('Confusion Matrix for Valence')
+    plt.xlabel('Predicted')
+    plt.ylabel('True')
+    plt.show()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
