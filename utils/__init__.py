@@ -1,1 +1,1 @@
-from .load_dataset import load_dataset
+from .load_dataset import load_dataset_NIRS, load_dataset_EEG

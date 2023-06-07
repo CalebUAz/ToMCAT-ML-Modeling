@@ -11,12 +11,12 @@ from sklearn.preprocessing import LabelEncoder
 import pandas as pd
 from sklearn.model_selection import KFold
 import matplotlib.pyplot as plt
-from utils import load_dataset
+from utils import load_dataset_EEG
 from tqdm import tqdm
 
-def train_LSTM_Affective_Individual_Task(path):
+def classify_LSTM_Affective_Individual_Task_EEG(path):
     # Load dataset
-    merged_df = load_dataset(path)
+    merged_df = load_dataset_EEG(path)
 
     # Check if CUDA is available
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -137,4 +137,4 @@ if __name__ == "__main__":
 
     arg = parser.parse_args()
     path = arg.p
-    sys.exit(train_LSTM_Affective_Individual_Task(path))
+    sys.exit(classify_LSTM_Affective_Individual_Task_EEG(path))
