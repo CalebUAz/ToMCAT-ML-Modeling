@@ -29,9 +29,9 @@ def train_LSTM_Affective_Individual_Task(path):
 
     # Hyperparameters
     input_size = features.shape[1]
-    hidden_size = 64
+    hidden_size = 128
     num_classes = 5  # Classes representing -2, -1, 0, 1, 2
-    num_epochs = 10
+    num_epochs = 1000
     batch_size = 32
     learning_rate = 0.001
     num_folds = 5
