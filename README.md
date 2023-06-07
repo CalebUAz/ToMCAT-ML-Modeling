@@ -32,12 +32,12 @@ pip install -r requirements.txt
 1. Prepare the dataset: Place your fNIRS dataset file in a directory. Note the path to this directory.
 2. Execute the script by running the following command:
 ```bash
-python3 script.py --p <path_to_nirs_dataset_directory>
+python3 NIRS_affective_individual_task_LSTM.py --p <path_to_nirs_dataset_directory>
 ```
 Replace `<path_to_dataset_directory>` with the actual path to the directory containing the fNIRS dataset.
 Example:
 ```bash
-python3 script.py --p ./data/dataset_directory
+python3 NIRS_affective_individual_task_LSTM.py --p ./data/dataset_directory
 ```
 3. The script will load the fNIRS affective task  dataset, preprocess the data, train the LSTM model, and evaluate its performance.
 4. After completion, the script will display the average accuracy and standard deviation across folds for arousal and valence scores. It will also print the average loss per fold and the standard deviation of loss per fold.
@@ -47,12 +47,12 @@ python3 script.py --p ./data/dataset_directory
 1. Prepare the dataset: Place your EEG dataset file in a directory. Note the path to this directory.
 2. Execute the script by running the following command:
 ```bash
-python3 script.py --p <path_to_eeg_dataset_directory>
+python3 EEG_affective_individual_task_LSTM.py --p <path_to_eeg_dataset_directory>
 ```
 Replace `<path_to_dataset_directory>` with the actual path to the directory containing the fNIRS dataset.
 Example:
 ```bash
-python3 script.py --p ./data/dataset_directory
+python3 NIRS_affective_individual_task_LSTM.py --p ./data/dataset_directory
 ```
 3. The script will load the EEG affective task dataset, preprocess the data, train the LSTM model, and evaluate its performance.
 4. After completion, the script will display the average accuracy and standard deviation across folds for arousal and valence scores. It will also print the average loss per fold and the standard deviation of loss per fold.
