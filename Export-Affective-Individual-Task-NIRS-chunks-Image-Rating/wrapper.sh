@@ -4,8 +4,9 @@
 This script runs after /ToMCAT-ML-Modeling/Export-Affective-Individual-Task-NIRS-chunks. It merges scores from baseline task raw folder with results from Individual-Task-NIRS-chunks. 
 Execution: ./wrapper.sh -r <raw_directory> -e <extracted_directory> -x <export_directory>
 
-e.g: ./wrapper.sh -r /tomcat/data/raw/LangLab/experiments/study_3_pilot/group -e /space/calebshibu/Neurips_new/Affective_Task_Individual -x /space/calebshibu/Affective_Task_Individual_rating
+e.g: ./wrapper.sh -r /tomcat/data/raw/LangLab/experiments/study_3_pilot/group -e /space/calebshibu/Affective_Task_Individual -x /space/calebshibu/Affective_Task_Individual_rating
 '''
+
 # Define an array of directories to ignore
 ignore=("exp_2022_04_01_13" "exp_2022_04_22_09" "exp_2023_04_17_13" "exp_2023_04_18_14" "exp_2023_04_20_14" "exp_2023_04_21_10" "exp_2023_04_24_13" "exp_2023_04_27_14" "exp_2023_04_28_10" "exp_2023_05_01_13" "exp_2023_05_02_14" "exp_2023_05_03_10")
 
