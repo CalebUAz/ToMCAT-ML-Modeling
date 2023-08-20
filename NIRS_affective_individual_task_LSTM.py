@@ -141,6 +141,12 @@ def classify_LSTM_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, 
         accuracy_valence = 100 * correct_valence / total
         fold_accuracies.append((accuracy_arousal, accuracy_valence))
 
+        print(f"Unique true arousal classes for Fold {fold+1}: {len(np.unique(targets_arousal.cpu()))}")
+        print(f"Unique predicted arousal classes for Fold {fold+1}: {len(np.unique(predicted_arousal.cpu()))}")
+
+        print(f"Unique true valence classes for Fold {fold+1}: {len(np.unique(targets_valence.cpu()))}")
+        print(f"Unique predicted valence classes for Fold {fold+1}: {len(np.unique(predicted_valence.cpu()))}")
+
     # Print average accuracy and standard deviation across folds
     arousal_accuracies, valence_accuracies = zip(*fold_accuracies)
     print("Average accuracy for arousal_score:", np.mean(arousal_accuracies))
