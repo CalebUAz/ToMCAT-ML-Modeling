@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 import pandas as pd
 import argparse
 import numpy as np
@@ -74,6 +75,7 @@ def classify_LSTM_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, 
     fold_accuracies = []
 
     for fold, (train_indices, test_indices) in enumerate(kfold.split(dataset)):
+        fold_start_time = time.time() #log the start time of the fold
         print(f"Fold {fold+1}/{num_folds}")
 
         # Split data into train and test sets for the current fold
@@ -105,7 +107,11 @@ def classify_LSTM_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, 
                 progress_bar.set_postfix(loss=loss.item())
 
         fold_losses.append(loss.item())
+        fold_end_time = time.time()
+        fold_elapsed_time = fold_end_time - fold_start_time
+        print(f"Time taken for fold {fold+1}: {fold_elapsed_time:.2f} seconds")
         print(f"Loss for Fold {fold+1}: {fold_losses[-1]}")
+
 
         # Testing
         model.eval()

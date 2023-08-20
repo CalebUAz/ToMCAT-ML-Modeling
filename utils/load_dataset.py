@@ -65,8 +65,7 @@ def load_dataset_NIRS(path):
                         if df.shape[1] == 42:
                             dfs.append(df)
                             count += 1
-                        else:
-                            print(df.shape, file_path)
+            
     print("-------------------------")
     print("Number of subjects: {}".format(count))
     print("-------------------------")
