@@ -6,6 +6,10 @@ def load_dataset_NIRS(path):
     print("-------------------------------------------------------------------------------------------------")
     print("Reading fNIRS affective task data from: {}".format(path))
     print("-------------------------------------------------------------------------------------------------")
+    
+    # Read ignore experimenter file
+    ignore_df = pd.read_csv('utils/ignore_experimenter.csv')
+
     directory = path
     dfs = []
     headers = [
@@ -35,6 +39,13 @@ def load_dataset_NIRS(path):
                 for file in os.listdir(folder_path):
                     if file.startswith('affective_individual_'):
                         file_path = os.path.join(folder_path, file)
+
+                        # Check if file path contains an ignore combination
+                        station = file.split('_')[-1].split('.')[0] # extract station name from the file name
+                        ignore_rows = ignore_df[(ignore_df['group_session'] == folder) & (ignore_df['station'] == station)]
+                        if not ignore_rows.empty:
+                            print(f"Ignoring file {file_path} because experimenter was sitting there")
+                            continue # Skip the rest and move to the next file
                         
                         df = pd.read_csv(file_path)
                         imac = os.path.basename(file).split('_')[0]
