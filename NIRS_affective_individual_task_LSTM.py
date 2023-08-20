@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import LabelEncoder
 import pandas as pd
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, StratifiedKFold
 import matplotlib.pyplot as plt
 from utils import load_dataset_NIRS
 from tqdm import tqdm
@@ -50,7 +50,8 @@ def classify_LSTM_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, 
 
     # Create DataLoaders
     dataset = TensorDataset(torch.tensor(features).float().to(device), torch.tensor(targets).long().to(device))
-    kfold = KFold(n_splits=num_folds, shuffle=True, random_state=42)
+    kfold = StratifiedKFold(n_splits=num_folds, shuffle=True, random_state=42)
+
 
     # Define model
     class LSTM(nn.Module):
