@@ -32,12 +32,12 @@ pip install -r requirements.txt
 1. Prepare the dataset: Place your fNIRS dataset file in a directory. Note the path to this directory.
 2. Execute the script by running the following command:
 ```bash
-python3 EEG_affective_individual_task_LSTM.py --p  /tomcat/data/derived/drafts/draft_2023_06_05_11/nirs/ --hidden_size 1024 --num_epochs 25 --batch_size 1024
+python3 NIRS_affective_individual_task_LSTM.py --p  /tomcat/data/derived/drafts/draft_2023_06_05_11/nirs/ --hidden_size 1024 --num_epochs 25 --batch_size 1024
 ```
 Replace `<path_to_dataset_directory>` with the actual path to the directory containing the fNIRS dataset.
 Example:
 ```bash
-python3 EEG_affective_individual_task_LSTM.py --p  /tomcat/data/derived/drafts/draft_2023_06_05_11/eeg/ --hidden_size 1024 --num_epochs 25 --batch_size 1024
+python3 NIRS_affective_individual_task_LSTM.py --p  /tomcat/data/derived/drafts/draft_2023_06_05_11/eeg/ --hidden_size 1024 --num_epochs 25 --batch_size 1024
 ```
 3. If you wish to pass hyperparameters like hidden_size, num_epochs, batch_size, learning_rate, etc, you can do so by sending those values as a flag. 
 4. The script will load the fNIRS affective task  dataset, preprocess the data, train the LSTM model, and evaluate its performance.
