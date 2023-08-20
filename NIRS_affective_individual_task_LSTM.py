@@ -84,6 +84,10 @@ def classify_LSTM_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, 
         train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
         test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
 
+        # Print size of the train and test split
+        print(f"Size of train data for Fold {fold+1}: {len(train_data)}")
+        print(f"Size of test data for Fold {fold+1}: {len(test_data)}")
+
         # Training
         model.train()
         for epoch in range(num_epochs):
