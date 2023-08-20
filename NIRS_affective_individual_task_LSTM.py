@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import LabelEncoder
 import pandas as pd
-from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.model_selection import KFold
 import matplotlib.pyplot as plt
 from utils import load_dataset_NIRS
 from tqdm import tqdm
@@ -43,19 +43,14 @@ def classify_LSTM_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, 
     valence_score = LabelEncoder().fit_transform(merged_df.iloc[:, -1] + 2)  # Same mapping for valence_score
     targets = list(zip(arousal_score, valence_score))
 
-    # Create composite labels for strafiied k-fold cross-validation
-    composite_labels = [f"{a}{v}" for a, v in zip(arousal_score, valence_score)]
-
-
-    # Hyperparameters
+     # Hyperparameters
     input_size = features.shape[1]
     num_classes = 5  # Classes representing -2, -1, 0, 1, 2
     num_folds = 5
 
     # Create DataLoaders
     dataset = TensorDataset(torch.tensor(features).float().to(device), torch.tensor(targets).long().to(device))
-    kfold = StratifiedKFold(n_splits=num_folds, shuffle=True, random_state=42)
-
+    kfold = KFold(n_splits=num_folds, shuffle=True, random_state=42)
 
     # Define model
     class LSTM(nn.Module):
@@ -79,7 +74,7 @@ def classify_LSTM_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, 
     fold_losses = []
     fold_accuracies = []
 
-    for fold, (train_indices, test_indices) in enumerate(kfold.split(features, composite_labels)):
+    for fold, (train_indices, test_indices) in enumerate(kfold.split(dataset)):
         fold_start_time = time.time() #log the start time of the fold
         print(f"Fold {fold+1}/{num_folds}")
 
