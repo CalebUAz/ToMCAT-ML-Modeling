@@ -43,7 +43,11 @@ def classify_LSTM_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, 
     valence_score = LabelEncoder().fit_transform(merged_df.iloc[:, -1] + 2)  # Same mapping for valence_score
     targets = list(zip(arousal_score, valence_score))
 
-     # Hyperparameters
+    # Create composite labels for strafiied k-fold cross-validation
+    composite_labels = [f"{a}{v}" for a, v in zip(arousal_score, valence_score)]
+
+
+    # Hyperparameters
     input_size = features.shape[1]
     num_classes = 5  # Classes representing -2, -1, 0, 1, 2
     num_folds = 5
@@ -75,7 +79,7 @@ def classify_LSTM_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, 
     fold_losses = []
     fold_accuracies = []
 
-    for fold, (train_indices, test_indices) in enumerate(kfold.split(dataset)):
+    for fold, (train_indices, test_indices) in enumerate(kfold.split(features, composite_labels)):
         fold_start_time = time.time() #log the start time of the fold
         print(f"Fold {fold+1}/{num_folds}")
 
