@@ -79,8 +79,8 @@ def classify_LSTM_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, b
         # Split data into train and test sets for the current fold
         train_data = Subset(dataset, train_indices)
         test_data = Subset(dataset, test_indices)
-        train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers = 10)
-        test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=True,num_workers = 10)
+        train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers = 2)
+        test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=True,num_workers = 2)
 
         # Training
         model.train()
