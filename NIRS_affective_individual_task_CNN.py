@@ -71,8 +71,9 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
                 nn.MaxPool1d(kernel_size=2, stride=2)
             )
             self.drop_out = nn.Dropout()
-            self.fc1 = nn.Linear(int(input_size/4) * 64, 1000)
-            self.fc2 = nn.Linear(1000, num_classes)
+            self.fc_arousal = nn.Linear(int(input_size/4) * 64, num_classes)
+            self.fc_valence = nn.Linear(int(input_size/4) * 64, num_classes)
+
 
         def forward(self, x):
             out = self.layer1(x)
@@ -80,9 +81,10 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
             out = out.reshape(out.size(0), -1)
             out = self.drop_out(out)
             out = self.fc1(out)
-            arousal_output = self.fc2(out)
-            valence_output = self.fc2(out)
-            return arousal_output, valence_output
+            arousal_out = self.fc_arousal(out)
+            valence_out = self.fc_valence(out)
+            return arousal_out, valence_out
+
 
 
     # Initialize model, loss, and optimizer
