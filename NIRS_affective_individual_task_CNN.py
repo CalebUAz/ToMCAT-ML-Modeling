@@ -80,7 +80,6 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
             out = self.layer2(out)
             out = out.reshape(out.size(0), -1)
             out = self.drop_out(out)
-            out = self.fc1(out)
             arousal_out = self.fc_arousal(out)
             valence_out = self.fc_valence(out)
             return arousal_out, valence_out
