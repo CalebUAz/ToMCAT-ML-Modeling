@@ -80,8 +80,10 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
             out = out.reshape(out.size(0), -1)
             out = self.drop_out(out)
             out = self.fc1(out)
-            out = self.fc2(out)
-            return out
+            arousal_output = self.fc2(out)
+            valence_output = self.fc2(out)
+            return arousal_output, valence_output
+
 
     # Initialize model, loss, and optimizer
     model = CNN(input_size, hidden_size, num_classes).to(device)  # Move the model to the GPU
@@ -111,10 +113,10 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
                 targets_arousal = targets[:, 0]
                 targets_valence = targets[:, 1]
 
-                outputs = model(inputs)
+                arousal_outputs, valence_outputs = model(inputs)
 
-                loss_arousal = criterion(outputs, targets_arousal)
-                loss_valence = criterion(outputs, targets_valence)
+                loss_arousal = criterion(arousal_outputs, targets_arousal)
+                loss_valence = criterion(valence_outputs, targets_valence)
 
                 loss = loss_arousal + loss_valence  # Total loss
 
@@ -138,10 +140,10 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
                 targets_arousal = targets[:, 0]
                 targets_valence = targets[:, 1]
 
-                outputs = model(inputs)
+                arousal_outputs, valence_outputs = model(inputs)
 
-                _, predicted_arousal = torch.max(outputs.data, 1)
-                _, predicted_valence = torch.max(outputs.data, 1)
+                _, predicted_arousal = torch.max(arousal_outputs.data, 1)
+                _, predicted_valence = torch.max(valence_outputs.data, 1)
 
                 total += targets.size(0)
                 correct_arousal += (predicted_arousal == targets_arousal).sum().item()
