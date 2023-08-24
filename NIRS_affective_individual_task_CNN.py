@@ -60,20 +60,25 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     class CNN(nn.Module):
         def __init__(self, input_size, hidden_size, num_classes):
             super(CNN, self).__init__()
+            
             self.layer1 = nn.Sequential(
-                nn.Conv1d(1, 32, kernel_size=5, stride=1, padding=2),
+                nn.Conv2d(1, 32, kernel_size=(5, 5), stride=1, padding=(2, 2)),
                 nn.ReLU(),
-                nn.MaxPool1d(kernel_size=2, stride=2)
+                # You can add pooling here if you want to downsample, but I'm omitting it for now.
             )
+            
             self.layer2 = nn.Sequential(
-                nn.Conv1d(32, 64, kernel_size=5, stride=1, padding=2),
+                nn.Conv2d(32, 64, kernel_size=(5, 5), stride=1, padding=(2, 2)),
                 nn.ReLU(),
-                nn.MaxPool1d(kernel_size=2, stride=2)
+                nn.MaxPool2d(kernel_size=2, stride=2)
             )
+            
+            # Assuming you're pooling in layer2, 
+            # the dimensions will be halved, so adjust the linear layer's input size
+            self.fc_arousal = nn.Linear((input_size[0]//2) * (input_size[1]//2) * 64, num_classes)
+            self.fc_valence = nn.Linear((input_size[0]//2) * (input_size[1]//2) * 64, num_classes)
+            
             self.drop_out = nn.Dropout()
-            self.fc_arousal = nn.Linear(int(input_size/4) * 64, num_classes)
-            self.fc_valence = nn.Linear(int(input_size/4) * 64, num_classes)
-
 
         def forward(self, x):
             out = self.layer1(x)
@@ -83,7 +88,6 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
             arousal_out = self.fc_arousal(out)
             valence_out = self.fc_valence(out)
             return arousal_out, valence_out
-
 
 
     # Initialize model, loss, and optimizer
