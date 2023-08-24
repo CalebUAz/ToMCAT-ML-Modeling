@@ -91,7 +91,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
 
 
     # Initialize model, loss, and optimizer
-    model = CNN(input_size, hidden_size, num_classes).to(device)  # Move the model to the GPU
+    model = CNN((50, 22), hidden_size, num_classes).to(device)  # Move the model to the GPU
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
