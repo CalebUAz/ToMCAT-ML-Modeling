@@ -71,7 +71,10 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
                 nn.MaxPool1d(kernel_size=2, stride=2)
             )
             self.drop_out = nn.Dropout()
-            self.conv_output_size = int((input_size[0] * input_size[1] / 4) * 64)
+
+            # Compute the size of the output after the convolutional layers
+            self.conv_output_size = 12 * 5 * 64
+            
             self.fc_arousal = nn.Linear(self.conv_output_size, num_classes)
             self.fc_valence = nn.Linear(self.conv_output_size, num_classes)
 
