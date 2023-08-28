@@ -121,7 +121,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
                 # print("Batch", i)
                 # print("Inputs shape:", inputs.shape)
                 # print("Targets shape:", targets.shape)
-                inputs = inputs.view(-1, 1, input_size)
+                inputs = inputs.view(-1, 1, 10, 22)
                 targets_arousal = targets[:, 0]
                 targets_valence = targets[:, 1]
 
