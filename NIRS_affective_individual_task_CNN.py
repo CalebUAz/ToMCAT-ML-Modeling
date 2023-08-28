@@ -58,39 +58,21 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
 
     # Define model
     class CNN(nn.Module):
-        def __init__(self, input_size, hidden_size, num_classes):
+        def __init__(self, input_size, num_classes):
             super(CNN, self).__init__()
             
-            self.layer1 = nn.Sequential(
-                nn.Conv2d(1, 32, kernel_size=(5, 5), stride=1, padding=(2, 2)),
-                nn.ReLU(),
-                nn.MaxPool2d(kernel_size=(2, 2), stride=2)
-            )
+            self.conv1 = nn.Conv1d(1, 32, kernel_size=3, stride=1, padding=1)
+            self.conv2 = nn.Conv1d(32, 64, kernel_size=3, stride=1, padding=1)
+            self.fc1 = nn.Linear(input_size * 64, 128)
+            self.fc2 = nn.Linear(128, num_classes)
             
-            self.layer2 = nn.Sequential(
-                nn.Conv2d(32, 64, kernel_size=(5, 5), stride=1, padding=(2, 2)),
-                nn.ReLU(),
-                nn.MaxPool2d(kernel_size=(2, 2), stride=2)
-            )
-            
-            self.drop_out = nn.Dropout()
-            
-            # Compute the size of the output after the convolutional layers
-            # This will depend on the size of your input and the convolutional layers.
-            # You might need to adjust this value based on the actual output size.
-            self.conv_output_size = 64 * 3 * 6  # This is just a placeholder. Adjust based on actual output size.
-            
-            self.fc_arousal = nn.Linear(self.conv_output_size, num_classes)
-            self.fc_valence = nn.Linear(self.conv_output_size, num_classes)
-
         def forward(self, x):
-            out = self.layer1(x)
-            out = self.layer2(out)
-            out = out.reshape(out.size(0), -1)
-            out = self.drop_out(out)
-            arousal_out = self.fc_arousal(out)
-            valence_out = self.fc_valence(out)
-            return arousal_out, valence_out
+            x = nn.ReLU()(self.conv1(x))
+            x = nn.ReLU()(self.conv2(x))
+            x = x.view(x.size(0), -1)  # Flatten the tensor
+            x = nn.ReLU()(self.fc1(x))
+            x = self.fc2(x)
+            return x
 
 
 
@@ -125,12 +107,14 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
                 targets_arousal = targets[:, 0]
                 targets_valence = targets[:, 1]
 
-                arousal_outputs, valence_outputs = model(inputs)
+                outputs = model(inputs)
 
-                # print("Shape of inputs:", inputs.shape)
-                # print("Shape of targets:", targets.shape)
-                # print("Shape of arousal_outputs:", arousal_outputs.shape)
-                # print("Shape of targets_arousal:", targets_arousal.shape)
+                _, predicted_arousal = torch.max(outputs.data, 1)
+                _, predicted_valence = torch.max(outputs.data, 1)
+
+                total += targets.size(0)
+                correct_arousal += (predicted_arousal == targets_arousal).sum().item()
+                correct_valence += (predicted_valence == targets_valence).sum().item()
 
 
                 loss_arousal = criterion(arousal_outputs, targets_arousal)
