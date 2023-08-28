@@ -117,9 +117,10 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
                 correct_arousal += (predicted_arousal == targets_arousal).sum().item()
                 correct_valence += (predicted_valence == targets_valence).sum().item()
 
+                outputs = model(inputs)
 
-                loss_arousal = criterion(arousal_outputs, targets_arousal)
-                loss_valence = criterion(valence_outputs, targets_valence)
+                loss_arousal = criterion(outputs, targets_arousal)
+                loss_valence = criterion(outputs, targets_valence)
 
                 loss = loss_arousal + loss_valence  # Total loss
 
