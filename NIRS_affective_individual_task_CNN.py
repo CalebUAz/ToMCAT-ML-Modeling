@@ -58,14 +58,12 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
 
     # Define model
     class CNN(nn.Module):
-        def __init__(self, input_size, num_classes):
+        def __init__(self, input_shape, num_classes):
             super(CNN, self).__init__()
-
-            print(type(input_size), input_size)  # Debugging line
             
-            self.conv1 = nn.Conv1d(1, 32, kernel_size=3, stride=1, padding=1)
-            self.conv2 = nn.Conv1d(32, 64, kernel_size=3, stride=1, padding=1)
-            self.fc1 = nn.Linear(input_size * 64, 128)
+            self.conv1 = nn.Conv2d(1, 32, kernel_size=(3, 3), stride=1, padding=1)
+            self.conv2 = nn.Conv2d(32, 64, kernel_size=(3, 3), stride=1, padding=1)
+            self.fc1 = nn.Linear(input_shape[0] * input_shape[1] * 64, 128)  # Adjusted for 2D input
             self.fc2 = nn.Linear(128, num_classes)
             
         def forward(self, x):
