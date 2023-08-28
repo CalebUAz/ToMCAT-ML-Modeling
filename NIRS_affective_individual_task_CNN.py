@@ -113,16 +113,19 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
         for epoch in range(num_epochs):
             progress_bar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{num_epochs}")
             for i, (inputs, targets) in enumerate(progress_bar):
+                print("Batch", i)
+                print("Inputs shape:", inputs.shape)
+                print("Targets shape:", targets.shape)
                 inputs = inputs.view(-1, 1, input_size)
                 targets_arousal = targets[:, 0]
                 targets_valence = targets[:, 1]
 
                 arousal_outputs, valence_outputs = model(inputs)
 
-                print("Shape of inputs:", inputs.shape)
-                print("Shape of targets:", targets.shape)
-                print("Shape of arousal_outputs:", arousal_outputs.shape)
-                print("Shape of targets_arousal:", targets_arousal.shape)
+                # print("Shape of inputs:", inputs.shape)
+                # print("Shape of targets:", targets.shape)
+                # print("Shape of arousal_outputs:", arousal_outputs.shape)
+                # print("Shape of targets_arousal:", targets_arousal.shape)
 
 
                 loss_arousal = criterion(arousal_outputs, targets_arousal)
