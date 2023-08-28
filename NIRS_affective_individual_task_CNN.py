@@ -141,10 +141,10 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
                 targets_arousal = targets[:, 0]
                 targets_valence = targets[:, 1]
 
-                arousal_outputs, valence_outputs = model(inputs)
+                outputs = model(inputs)
 
-                _, predicted_arousal = torch.max(arousal_outputs.data, 1)
-                _, predicted_valence = torch.max(valence_outputs.data, 1)
+                _, predicted_arousal = torch.max(outputs.data, 1)
+                _, predicted_valence = torch.max(outputs.data, 1)
 
                 total += targets.size(0)
                 correct_arousal += (predicted_arousal == targets_arousal).sum().item()
