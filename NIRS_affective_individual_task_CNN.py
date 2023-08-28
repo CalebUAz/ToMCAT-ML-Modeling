@@ -60,6 +60,8 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     class CNN(nn.Module):
         def __init__(self, input_size, num_classes):
             super(CNN, self).__init__()
+
+            print(type(input_size), input_size)  # Debugging line
             
             self.conv1 = nn.Conv1d(1, 32, kernel_size=3, stride=1, padding=1)
             self.conv2 = nn.Conv1d(32, 64, kernel_size=3, stride=1, padding=1)
