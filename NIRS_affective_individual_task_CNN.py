@@ -47,7 +47,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     targets = list(zip(valence, arousal))
 
     # Hyperparameters
-    input_size = features.shape[1]
+    input_size = features.shape[1:]
     num_classes = 5  # Classes representing -2, -1, 0, 1, 2
     num_folds = 5
 
