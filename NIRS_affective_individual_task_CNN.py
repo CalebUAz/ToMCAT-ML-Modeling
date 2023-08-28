@@ -97,6 +97,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
 
         # Training
         model.train()
+        correct_arousal, correct_valence, total = 0, 0, 0
         for epoch in range(num_epochs):
             progress_bar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{num_epochs}")
             for i, (inputs, targets) in enumerate(progress_bar):
@@ -133,8 +134,6 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
 
         # Testing
         model.eval()
-        correct_arousal, correct_valence = 0, 0
-        total = 0
 
         with torch.no_grad():
             for inputs, targets in test_loader:
