@@ -10,4 +10,9 @@ def sliding_window(signals, valence, arousal, **options):
         dataX.append(a)
         dataValenceScore.append(valence[i:(i+look_back)])
         dataArousalScore.append(arousal[i:(i+look_back)])
+
+    # Generate a single most frequently occurring label for each window
+    dataValenceScore = [np.argmax(np.bincount(x)) for x in dataValenceScore]
+    dataArousalScore = [np.argmax(np.bincount(x)) for x in dataArousalScore]
+
     return np.array(dataX), np.array(dataValenceScore), np.array(dataArousalScore)
