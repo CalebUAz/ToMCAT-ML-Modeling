@@ -61,12 +61,12 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
         def __init__(self, input_size, hidden_size, num_classes):
             super(CNN, self).__init__()
             self.layer1 = nn.Sequential(
-                nn.Conv1d(1, 32, kernel_size=5, stride=1, padding=2),
+                nn.Conv2d(1, 32, kernel_size=5, stride=1, padding=2),
                 nn.ReLU(),
                 nn.MaxPool1d(kernel_size=2, stride=2)
             )
             self.layer2 = nn.Sequential(
-                nn.Conv1d(32, 64, kernel_size=5, stride=1, padding=2),
+                nn.Conv2d(32, 64, kernel_size=5, stride=1, padding=2),
                 nn.ReLU(),
                 nn.MaxPool1d(kernel_size=2, stride=2)
             )
@@ -113,9 +113,9 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
         for epoch in range(num_epochs):
             progress_bar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{num_epochs}")
             for i, (inputs, targets) in enumerate(progress_bar):
-                print("Batch", i)
-                print("Inputs shape:", inputs.shape)
-                print("Targets shape:", targets.shape)
+                # print("Batch", i)
+                # print("Inputs shape:", inputs.shape)
+                # print("Targets shape:", targets.shape)
                 inputs = inputs.view(-1, 1, input_size)
                 targets_arousal = targets[:, 0]
                 targets_valence = targets[:, 1]
