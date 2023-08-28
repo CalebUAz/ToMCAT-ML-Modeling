@@ -72,11 +72,11 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
             )
             self.drop_out = nn.Dropout()
 
-            # Compute the size of the output after the convolutional layers
-            self.conv_output_size = 12 * 5 * 64
+            # # Compute the size of the output after the convolutional layers
+            # self.conv_output_size = 12 * 5 * 64
             
-            self.fc_arousal = nn.Linear(self.conv_output_size, num_classes)
-            self.fc_valence = nn.Linear(self.conv_output_size, num_classes)
+            self.fc_arousal = nn.Linear(128, num_classes)
+            self.fc_valence = nn.Linear(128, num_classes)
 
         def forward(self, x):
             out = self.layer1(x)
