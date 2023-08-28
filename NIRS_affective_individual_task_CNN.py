@@ -60,33 +60,38 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     class CNN(nn.Module):
         def __init__(self, input_size, hidden_size, num_classes):
             super(CNN, self).__init__()
-            self.layer1 = nn.Sequential(
-                nn.Conv2d(1, 32, kernel_size=5, stride=1, padding=2),
-                nn.ReLU(),
-                nn.MaxPool1d(kernel_size=2, stride=2)
-            )
-            self.layer2 = nn.Sequential(
-                nn.Conv2d(32, 64, kernel_size=5, stride=1, padding=2),
-                nn.ReLU(),
-                nn.MaxPool1d(kernel_size=2, stride=2)
-            )
-            self.drop_out = nn.Dropout()
-
-            # # Compute the size of the output after the convolutional layers
-            # self.conv_output_size = 12 * 5 * 64
             
-            self.fc_arousal = nn.Linear(128, num_classes)
-            self.fc_valence = nn.Linear(128, num_classes)
+            self.layer1 = nn.Sequential(
+                nn.Conv2d(1, 32, kernel_size=(5, 5), stride=1, padding=(2, 2)),
+                nn.ReLU(),
+                nn.MaxPool2d(kernel_size=(2, 2), stride=2)
+            )
+            
+            self.layer2 = nn.Sequential(
+                nn.Conv2d(32, 64, kernel_size=(5, 5), stride=1, padding=(2, 2)),
+                nn.ReLU(),
+                nn.MaxPool2d(kernel_size=(2, 2), stride=2)
+            )
+            
+            self.drop_out = nn.Dropout()
+            
+            # Compute the size of the output after the convolutional layers
+            # This will depend on the size of your input and the convolutional layers.
+            # You might need to adjust this value based on the actual output size.
+            self.conv_output_size = 64 * 3 * 6  # This is just a placeholder. Adjust based on actual output size.
+            
+            self.fc_arousal = nn.Linear(self.conv_output_size, num_classes)
+            self.fc_valence = nn.Linear(self.conv_output_size, num_classes)
 
         def forward(self, x):
             out = self.layer1(x)
             out = self.layer2(out)
             out = out.reshape(out.size(0), -1)
             out = self.drop_out(out)
-            print(out.shape)
             arousal_out = self.fc_arousal(out)
             valence_out = self.fc_valence(out)
             return arousal_out, valence_out
+
 
 
     # Initialize model, loss, and optimizer
