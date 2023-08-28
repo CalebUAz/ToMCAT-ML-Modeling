@@ -119,6 +119,12 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
 
                 arousal_outputs, valence_outputs = model(inputs)
 
+                print("Shape of inputs:", inputs.shape)
+                print("Shape of targets:", targets.shape)
+                print("Shape of arousal_outputs:", arousal_outputs.shape)
+                print("Shape of targets_arousal:", targets_arousal.shape)
+
+
                 loss_arousal = criterion(arousal_outputs, targets_arousal)
                 loss_valence = criterion(valence_outputs, targets_valence)
 
