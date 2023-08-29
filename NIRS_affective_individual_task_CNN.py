@@ -63,12 +63,14 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
             
             self.conv1 = nn.Conv2d(1, 32, kernel_size=(3, 3), stride=1, padding=1)
             self.conv2 = nn.Conv2d(32, 64, kernel_size=(3, 3), stride=1, padding=1)
-            self.fc1 = nn.Linear(input_shape[0] * input_shape[1] * 64, 128)  # Adjusted for 2D input
+            self.conv3 = nn.Conv2d(32, 128, kernel_size=(3, 3), stride=1, padding=1)
+            self.fc1 = nn.Linear(input_shape[0] * input_shape[1] * 128, 128)  # Adjusted for 2D input
             self.fc2 = nn.Linear(128, num_classes)
             
         def forward(self, x):
             x = nn.ReLU()(self.conv1(x))
             x = nn.ReLU()(self.conv2(x))
+            x = nn.ReLU()(self.conv3(x))
             x = x.view(x.size(0), -1)  # Flatten the tensor
             x = nn.ReLU()(self.fc1(x))
             x = self.fc2(x)
@@ -175,7 +177,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     # Plotting confusion matrix for arousal
     plt.figure(figsize=(20, 14))
     sns.heatmap(arousal_cm, annot=True, fmt='d', xticklabels=class_names, yticklabels=class_names, cmap='Blues', annot_kws={"size": 16})
-    plt.title(f'EEG: Confusion Matrix for Arousal\nHidden Size: {hidden_size}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {accuracy_arousal:.2f}%, std: {np.std(arousal_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
+    plt.title(f'NIRS-CNN: Confusion Matrix for Arousal\nHidden Size: {hidden_size}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {accuracy_arousal:.2f}%, std: {np.std(arousal_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
     plt.xlabel('Predicted')
     plt.ylabel('True')
     save_plot_with_timestamp(plt, 'confusion_matrix_arousal', output_folder)
@@ -183,7 +185,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     # Plotting confusion matrix for valence
     plt.figure(figsize=(20, 14))
     sns.heatmap(valence_cm, annot=True, fmt='d', xticklabels=class_names, yticklabels=class_names, cmap='Blues', annot_kws={"size": 16})
-    plt.title(f'EEG: Confusion Matrix for Valence\nHidden Size: {hidden_size}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {accuracy_valence:.2f}%, std: {np.std(valence_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
+    plt.title(f'NIRS-CNN: Confusion Matrix for Valence\nHidden Size: {hidden_size}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {accuracy_valence:.2f}%, std: {np.std(valence_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
     plt.xlabel('Predicted')
     plt.ylabel('True')
     save_plot_with_timestamp(plt, 'confusion_matrix_valence', output_folder)
