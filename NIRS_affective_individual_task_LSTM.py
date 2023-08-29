@@ -58,12 +58,14 @@ def classify_LSTM_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, 
             super(LSTM, self).__init__()
             self.hidden_size = hidden_size
             self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True)
-            self.fc = nn.Linear(hidden_size, num_classes)
+            self.fc_arousal = nn.Linear(hidden_size, num_classes)
+            self.fc_valence = nn.Linear(hidden_size, num_classes)
         
         def forward(self, x):
             out, _ = self.lstm(x)
-            out = self.fc(out[:, -1, :])
-            return out
+            arousal = self.fc_arousal(out[:, -1, :])
+            valence = self.fc_valence(out[:, -1, :])
+            return arousal, valence
 
     # Initialize model, loss, and optimizer
     model = LSTM(input_size, hidden_size, num_classes).to(device)  # Move the model to the GPU
@@ -73,6 +75,9 @@ def classify_LSTM_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, 
     # Perform k-fold cross-validation
     fold_losses = []
     fold_accuracies = []
+    all_true_arousal, all_pred_arousal = [], []
+    all_true_valence, all_pred_valence = [], []
+
 
     for fold, (train_indices, test_indices) in enumerate(kfold.split(dataset)):
         fold_start_time = time.time() #log the start time of the fold
@@ -97,10 +102,12 @@ def classify_LSTM_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, 
                 targets_arousal = targets[:, 0]
                 targets_valence = targets[:, 1]
 
-                outputs = model(inputs)
+                arousal_outputs, valence_outputs = model(inputs)
+                loss_arousal = criterion(arousal_outputs, targets_arousal)
+                loss_valence = criterion(valence_outputs, targets_valence)
 
-                loss_arousal = criterion(outputs, targets_arousal)
-                loss_valence = criterion(outputs, targets_valence)
+                # loss_arousal = criterion(outputs, targets_arousal)
+                # loss_valence = criterion(outputs, targets_valence)
 
                 loss = loss_arousal + loss_valence  # Total loss
 
@@ -128,10 +135,18 @@ def classify_LSTM_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, 
                 targets_arousal = targets[:, 0]
                 targets_valence = targets[:, 1]
 
-                outputs = model(inputs)
+                arousal_outputs, valence_outputs = model(inputs)
+                _, predicted_arousal = torch.max(arousal_outputs.data, 1)
+                _, predicted_valence = torch.max(valence_outputs.data, 1)
 
-                _, predicted_arousal = torch.max(outputs.data, 1)
-                _, predicted_valence = torch.max(outputs.data, 1)
+                # _, predicted_arousal = torch.max(outputs.data, 1)
+                # _, predicted_valence = torch.max(outputs.data, 1)
+
+                all_true_arousal.extend(targets_arousal.cpu().numpy())
+                all_pred_arousal.extend(predicted_arousal.cpu().numpy())
+                all_true_valence.extend(targets_valence.cpu().numpy())
+                all_pred_valence.extend(predicted_valence.cpu().numpy())
+
 
                 total += targets.size(0)
                 correct_arousal += (predicted_arousal == targets_arousal).sum().item()
@@ -158,8 +173,12 @@ def classify_LSTM_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, 
     print(f"Average loss per fold: {np.mean(fold_losses)}")
     print(f"Standard deviation of loss per fold: {np.std(fold_losses)}")
 
-    arousal_cm = confusion_matrix(targets_arousal.cpu(), predicted_arousal.cpu())
-    valence_cm = confusion_matrix(targets_valence.cpu(), predicted_valence.cpu())
+    arousal_cm = confusion_matrix(all_true_arousal, all_pred_arousal)
+    valence_cm = confusion_matrix(all_true_valence, all_pred_valence)
+
+
+    # arousal_cm = confusion_matrix(targets_arousal.cpu(), predicted_arousal.cpu())
+    # valence_cm = confusion_matrix(targets_valence.cpu(), predicted_valence.cpu())
     
     # Define the class names (assuming -2 to 2 for arousal and valence scores)
     class_names = [-2, -1, 0, 1, 2]
