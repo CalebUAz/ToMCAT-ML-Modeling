@@ -141,7 +141,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
 
         with torch.no_grad():
             for inputs, targets in test_loader:
-                inputs = inputs.view(-1, 1, input_size)
+                inputs = inputs.view(-1, 1, *input_size)
                 targets_arousal = targets[:, 0]
                 targets_valence = targets[:, 1]
 
