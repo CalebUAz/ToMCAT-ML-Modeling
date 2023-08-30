@@ -67,7 +67,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
             self.conv3 = nn.Conv2d(64, 128, kernel_size=(3, 3), stride=1, padding=1)
             self.fc1 = nn.Linear(input_shape[0] * input_shape[1] * 128, 128)  # Adjusted for 2D input
             self.fc_arousal = nn.Linear(128, num_classes)
-            self.fc_valence = nn.Linear(hidden_size, num_classes)
+            self.fc_valence = nn.Linear(128, num_classes)
             
         def forward(self, x):
             x = nn.ReLU()(self.conv1(x))
