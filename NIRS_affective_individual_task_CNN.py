@@ -75,8 +75,8 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
             x = nn.ReLU()(self.conv3(x))
             x = x.view(x.size(0), -1)  # Flatten the tensor
             x = nn.ReLU()(self.fc1(x))
-            arousal = self.fc_arousal(x[:, -1, :])
-            valence = self.fc_valence(x[:, -1, :])
+            arousal = self.fc_arousal(x)
+            valence = self.fc_valence(x)
             return arousal, valence
 
 
