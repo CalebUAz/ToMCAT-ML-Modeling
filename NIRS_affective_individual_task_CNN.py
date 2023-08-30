@@ -108,7 +108,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
         for epoch in range(num_epochs):
             progress_bar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{num_epochs}")
             for i, (inputs, targets) in enumerate(progress_bar):
-                inputs = inputs.view(-1, 1, input_size)
+                inputs = inputs.view(-1, 1, *input_size)
                 targets_arousal = targets[:, 0]
                 targets_valence = targets[:, 1]
 
