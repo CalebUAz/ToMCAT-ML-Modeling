@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import pandas as pd
 import argparse
 import numpy as np
@@ -65,7 +66,8 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
             self.conv2 = nn.Conv2d(32, 64, kernel_size=(3, 3), stride=1, padding=1)
             self.conv3 = nn.Conv2d(64, 128, kernel_size=(3, 3), stride=1, padding=1)
             self.fc1 = nn.Linear(input_shape[0] * input_shape[1] * 128, 128)  # Adjusted for 2D input
-            self.fc2 = nn.Linear(128, num_classes)
+            self.fc_arousal = nn.Linear(128, num_classes)
+            self.fc_valence = nn.Linear(hidden_size, num_classes)
             
         def forward(self, x):
             x = nn.ReLU()(self.conv1(x))
@@ -73,8 +75,9 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
             x = nn.ReLU()(self.conv3(x))
             x = x.view(x.size(0), -1)  # Flatten the tensor
             x = nn.ReLU()(self.fc1(x))
-            x = self.fc2(x)
-            return x
+            arousal = self.fc_arousal(x[:, -1, :])
+            valence = self.fc_valence(x[:, -1, :])
+            return arousal, valence
 
 
 
@@ -87,8 +90,11 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     # Perform k-fold cross-validation
     fold_losses = []
     fold_accuracies = []
+    all_true_arousal, all_pred_arousal = [], []
+    all_true_valence, all_pred_valence = [], []
 
     for fold, (train_indices, test_indices) in enumerate(kfold.split(dataset)):
+        fold_start_time = time.time() #log the start time of the fold
         print(f"Fold {fold+1}/{num_folds}")
 
         # Split data into train and test sets for the current fold
@@ -99,30 +105,19 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
 
         # Training
         model.train()
-        correct_arousal, correct_valence, total = 0, 0, 0
         for epoch in range(num_epochs):
             progress_bar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{num_epochs}")
             for i, (inputs, targets) in enumerate(progress_bar):
-                # print("Batch", i)
-                # print("Inputs shape:", inputs.shape)
-                # print("Targets shape:", targets.shape)
-                inputs = inputs.view(-1, 1, 10, 22)
+                inputs = inputs.view(-1, 1, input_size)
                 targets_arousal = targets[:, 0]
                 targets_valence = targets[:, 1]
 
-                outputs = model(inputs)
+                arousal_outputs, valence_outputs = model(inputs)
+                loss_arousal = criterion(arousal_outputs, targets_arousal)
+                loss_valence = criterion(valence_outputs, targets_valence)
 
-                _, predicted_arousal = torch.max(outputs.data, 1)
-                _, predicted_valence = torch.max(outputs.data, 1)
-
-                total += targets.size(0)
-                correct_arousal += (predicted_arousal == targets_arousal).sum().item()
-                correct_valence += (predicted_valence == targets_valence).sum().item()
-
-                outputs = model(inputs)
-
-                loss_arousal = criterion(outputs, targets_arousal)
-                loss_valence = criterion(outputs, targets_valence)
+                # loss_arousal = criterion(outputs, targets_arousal)
+                # loss_valence = criterion(outputs, targets_valence)
 
                 loss = loss_arousal + loss_valence  # Total loss
 
@@ -133,21 +128,35 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
                 progress_bar.set_postfix(loss=loss.item())
 
         fold_losses.append(loss.item())
+        fold_end_time = time.time()
+        fold_elapsed_time = fold_end_time - fold_start_time
+        print(f"Time taken for fold {fold+1}: {fold_elapsed_time:.2f} seconds")
         print(f"Loss for Fold {fold+1}: {fold_losses[-1]}")
+
 
         # Testing
         model.eval()
+        correct_arousal, correct_valence = 0, 0
+        total = 0
 
         with torch.no_grad():
             for inputs, targets in test_loader:
-                inputs = inputs.view(-1, 1, *input_size)
+                inputs = inputs.view(-1, 1, input_size)
                 targets_arousal = targets[:, 0]
                 targets_valence = targets[:, 1]
 
-                outputs = model(inputs)
+                arousal_outputs, valence_outputs = model(inputs)
+                _, predicted_arousal = torch.max(arousal_outputs.data, 1)
+                _, predicted_valence = torch.max(valence_outputs.data, 1)
 
-                _, predicted_arousal = torch.max(outputs.data, 1)
-                _, predicted_valence = torch.max(outputs.data, 1)
+                # _, predicted_arousal = torch.max(outputs.data, 1)
+                # _, predicted_valence = torch.max(outputs.data, 1)
+
+                all_true_arousal.extend(targets_arousal.cpu().numpy())
+                all_pred_arousal.extend(predicted_arousal.cpu().numpy())
+                all_true_valence.extend(targets_valence.cpu().numpy())
+                all_pred_valence.extend(predicted_valence.cpu().numpy())
+
 
                 total += targets.size(0)
                 correct_arousal += (predicted_arousal == targets_arousal).sum().item()
@@ -168,8 +177,8 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     print(f"Average loss per fold: {np.mean(fold_losses)}")
     print(f"Standard deviation of loss per fold: {np.std(fold_losses)}")
 
-    arousal_cm = confusion_matrix(targets_arousal.cpu(), predicted_arousal.cpu())
-    valence_cm = confusion_matrix(targets_valence.cpu(), predicted_valence.cpu())
+    arousal_cm = confusion_matrix(all_true_arousal, all_pred_arousal)
+    valence_cm = confusion_matrix(all_true_valence, all_pred_valence)
     
     # Define the class names (assuming -2 to 2 for arousal and valence scores)
     class_names = [-2, -1, 0, 1, 2]
