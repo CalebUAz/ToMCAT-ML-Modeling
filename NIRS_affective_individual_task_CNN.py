@@ -17,7 +17,7 @@ from tqdm import tqdm
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
-from utils import save_plot_with_timestamp, sliding_window, load_dataset_NIRS
+from utils import save_plot_with_timestamp, sliding_window, load_dataset_NIRS, sliding_window_no_overlap
 
 def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate):
 
@@ -44,7 +44,8 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
 
     # Get images from sliding window
     look_back = 10
-    features, valence, arousal = sliding_window(features, valence_score, arousal_score, look_back=look_back)
+    # features, valence, arousal = sliding_window(features, valence_score, arousal_score, look_back=look_back)
+    features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, look_back=look_back)
     targets = list(zip(valence, arousal))
 
     # Hyperparameters
