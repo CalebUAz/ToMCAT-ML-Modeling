@@ -186,7 +186,7 @@ def classify_LSTM_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, 
     # Plotting confusion matrix for arousal
     plt.figure(figsize=(20, 14))
     sns.heatmap(arousal_cm, annot=True, fmt='d', xticklabels=class_names, yticklabels=class_names, cmap='Blues', annot_kws={"size": 16})
-    plt.title(f'fNIRS: Confusion Matrix for Arousal\nHidden Size: {hidden_size}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {accuracy_arousal:.2f}%, std: {np.std(arousal_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
+    plt.title(f'fNIRS: Confusion Matrix for Arousal\nHidden Size: {hidden_size}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {np.mean(arousal_accuracies):.2f}%, std: {np.std(arousal_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
     plt.xlabel('Predicted')
     plt.ylabel('True')
     save_plot_with_timestamp(plt, 'confusion_matrix_arousal', output_folder)
@@ -194,7 +194,7 @@ def classify_LSTM_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, 
     # Plotting confusion matrix for valence
     plt.figure(figsize=(20, 14))
     sns.heatmap(valence_cm, annot=True, fmt='d', xticklabels=class_names, yticklabels=class_names, cmap='Blues', annot_kws={"size": 16})
-    plt.title(f'fNIRS: Confusion Matrix for Valence\nHidden Size: {hidden_size}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {accuracy_valence:.2f}%, std: {np.std(valence_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
+    plt.title(f'fNIRS: Confusion Matrix for Valence\nHidden Size: {hidden_size}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {np.mean(arousal_accuracies):.2f}%, std: {np.std(valence_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
     plt.xlabel('Predicted')
     plt.ylabel('True')
     save_plot_with_timestamp(plt, 'confusion_matrix_valence', output_folder)
