@@ -34,6 +34,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     merged_df = load_dataset_NIRS(path)
 
     if subject_wise_split:
+        num_folds = 5
         unique_subject_ids = np.array(merged_df['subject_id'].unique())
         kfolds_subjects = KFold(n_splits=num_folds, shuffle=True, random_state=42)
         folds = kfolds_subjects.split(unique_subject_ids)
