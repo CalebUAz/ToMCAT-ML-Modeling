@@ -12,6 +12,7 @@ def load_dataset_NIRS(path):
 
     directory = path
     dfs = []
+    subject_ids = []
     headers = [
         "S1-D1_HbO", "S1-D2_HbO", "S2-D1_HbO", "S2-D3_HbO", "S3-D1_HbO",
         "S3-D3_HbO", "S3-D4_HbO", "S4-D2_HbO", "S4-D4_HbO", "S4-D5_HbO",
@@ -75,6 +76,7 @@ def load_dataset_NIRS(path):
                         
                         if df.shape[1] == 42:
                             dfs.append(df)
+                            subject_ids.append(folder)
                             count += 1
             
     print("-------------------------")
@@ -83,6 +85,9 @@ def load_dataset_NIRS(path):
     combined_df = pd.concat(dfs, ignore_index=True)
     combined_df = combined_df.set_axis(headers, axis=1)
     combined_df = combined_df[columns_to_keep]
+
+    # Subject id for train test split logic
+    combined_df['subject_id'] = np.concatenate([[subject] * len(df) for subject, df in zip(subject_ids, dfs)])
 
     return combined_df
 

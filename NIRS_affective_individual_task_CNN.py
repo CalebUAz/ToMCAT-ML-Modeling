@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from utils import save_plot_with_timestamp, sliding_window, load_dataset_NIRS, sliding_window_no_overlap
 
-def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate):
+def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_wise_split=False):
 
     # Create the output folder if it doesn't exist
     output_folder = 'output'
@@ -32,6 +32,13 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
         
     # Load dataset
     merged_df = load_dataset_NIRS(path)
+
+    if subject_wise_split:
+        unique_subject_ids = np.array(merged_df['subject_id'].unique())
+        kfolds_subjects = KFold(n_splits=num_folds, shuffle=True, random_state=42)
+        folds = kfolds_subjects.split(unique_subject_ids)
+    else:
+        folds = kfold.split(dataset)
 
     # Check if CUDA is available
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -55,7 +62,15 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
 
     # Create DataLoaders
     dataset = TensorDataset(torch.tensor(features).float().to(device), torch.tensor(targets).long().to(device))
-    kfold = KFold(n_splits=num_folds, shuffle=True, random_state=42)
+    # kfold = KFold(n_splits=num_folds, shuffle=True, random_state=42)
+    if subject_wise_split:
+        # Assuming you have a 'subject_id' column in your 'merged_df' to identify subjects
+        unique_subject_ids = np.array(merged_df['subject_id'].unique())
+        kfolds_subjects = KFold(n_splits=num_folds, shuffle=True, random_state=42)
+        folds = kfolds_subjects.split(unique_subject_ids)
+    else:
+        kfold = KFold(n_splits=num_folds, shuffle=True, random_state=42)
+        folds = kfold.split(dataset)
 
 
     # Define model
@@ -94,8 +109,14 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     all_true_arousal, all_pred_arousal = [], []
     all_true_valence, all_pred_valence = [], []
 
-    for fold, (train_indices, test_indices) in enumerate(kfold.split(dataset)):
-        fold_start_time = time.time() #log the start time of the fold
+    for fold, (train_indices, test_indices) in enumerate(folds):
+        if subject_wise_split:
+            train_subjects = unique_subject_ids[train_indices]
+            test_subjects = unique_subject_ids[test_indices]
+            train_indices = merged_df[merged_df['subject_id'].isin(train_subjects)].index.values
+            test_indices = merged_df[merged_df['subject_id'].isin(test_subjects)].index.values
+
+        fold_start_time = time.time()  # log the start time of the fold
         print(f"Fold {fold+1}/{num_folds}")
 
         # Split data into train and test sets for the current fold
@@ -220,11 +241,16 @@ if __name__ == "__main__":
         "--learning_rate", type=float, default=0.001, help="Learning rate for optimizer"
     )
 
+    parser.add_argument(
+        "--subject_wise_split", type=bool, default=False, help="Enable subject wise split"
+    )
+
     args = parser.parse_args()
     path = args.p
     hidden_size = args.hidden_size
     num_epochs = args.num_epochs
     batch_size = args.batch_size
     learning_rate = args.learning_rate
+    subject_wise_split = args.subject_wise_split
 
-    sys.exit(classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate))
+    sys.exit(classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_wise_split))
