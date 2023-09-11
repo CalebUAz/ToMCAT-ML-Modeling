@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from utils import save_plot_with_timestamp, sliding_window, load_dataset_NIRS, sliding_window_no_overlap
 
-def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate):
+def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout):
 
     # Create the output folder if it doesn't exist
     output_folder = 'output'
@@ -32,6 +32,11 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
         
     # Load dataset
     merged_df = load_dataset_NIRS(path)
+
+    if subject_holdout:
+        print("Using subject holdout for CV")
+    else:
+        merged_df = merged_df.drop(['subject'], axis=1)
 
     # Check if CUDA is available
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -220,11 +225,16 @@ if __name__ == "__main__":
         "--learning_rate", type=float, default=0.001, help="Learning rate for optimizer"
     )
 
+    parser.add_argument(
+        "--subject_holdout", type=bool, default=False, help="Use subject holdout for CV"
+    )
+
     args = parser.parse_args()
     path = args.p
     hidden_size = args.hidden_size
     num_epochs = args.num_epochs
     batch_size = args.batch_size
     learning_rate = args.learning_rate
+    subject_holdout = args.subject_holdout
 
-    sys.exit(classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate))
+    sys.exit(classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout))
