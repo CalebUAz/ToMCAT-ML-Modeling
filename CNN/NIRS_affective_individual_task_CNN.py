@@ -18,7 +18,7 @@ from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import GroupShuffleSplit
-from utils import save_plot_with_timestamp, sliding_window, load_dataset_NIRS, sliding_window_no_overlap, train_test_split
+from utils import save_plot_with_timestamp, sliding_window, load_dataset_NIRS, sliding_window_no_overlap, train_test_split, train_test_split, train_test_split_subject_holdout
 
 def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout):
 
@@ -100,7 +100,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
     if subject_holdout:
-        print()
+        fold_losses, fold_accuracies, all_true_arousal, all_pred_arousal, all_true_valence, all_pred_valence = train_test_split_subject_holdout(kfold, dataset, num_folds, num_epochs, batch_size, input_size, model, criterion, optimizer, time, tqdm, Subset, DataLoader, torch)
     else:
         fold_losses, fold_accuracies, all_true_arousal, all_pred_arousal, all_true_valence, all_pred_valence = train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_size, model, criterion, optimizer, time, tqdm, Subset, DataLoader, torch)
 
