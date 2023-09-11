@@ -81,7 +81,7 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
     return fold_losses, fold_accuracies, all_true_arousal, all_pred_arousal, all_true_valence, all_pred_valence
 
 
-def train_test_split_subject_holdout(group_split,groups, dataset, num_folds, num_epochs, batch_size, input_size, model, criterion, optimizer, time, tqdm, Subset, DataLoader, torch, features):
+def train_test_split_subject_holdout(group_split,groups, targets, dataset, num_folds, num_epochs, batch_size, input_size, model, criterion, optimizer, time, tqdm, Subset, DataLoader, torch, features):
     # Perform k-fold cross-validation
     fold_losses = []
     fold_accuracies = []
