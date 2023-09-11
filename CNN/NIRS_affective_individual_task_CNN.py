@@ -17,6 +17,7 @@ from tqdm import tqdm
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.model_selection import GroupShuffleSplit
 from utils import save_plot_with_timestamp, sliding_window, load_dataset_NIRS, sliding_window_no_overlap
 
 def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout):
@@ -60,7 +61,12 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
 
     # Create DataLoaders
     dataset = TensorDataset(torch.tensor(features).float().to(device), torch.tensor(targets).long().to(device))
-    kfold = KFold(n_splits=num_folds, shuffle=True, random_state=42)
+    if subject_holdout:
+        # Use 80% of the subjects for training
+        group_split = GroupShuffleSplit(n_splits=num_folds, train_size=0.8, random_state=42)
+        groups = merged_df['subject_id'].values
+    else:
+        kfold = KFold(n_splits=num_folds, shuffle=True, random_state=42)
 
 
     # Define model
