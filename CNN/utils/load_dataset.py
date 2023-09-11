@@ -87,7 +87,7 @@ def load_dataset_NIRS(path):
     combined_df = combined_df[columns_to_keep]
 
     # Subject id for train test split logic
-    # combined_df['subject_id'] = np.concatenate([[subject] * len(df) for subject, df in zip(subject_ids, dfs)])
+    combined_df['subject_id'] = np.concatenate([[subject] * len(df) for subject, df in zip(subject_ids, dfs)])
 
     return combined_df
 

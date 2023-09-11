@@ -36,7 +36,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     if subject_holdout:
         print("Using subject holdout for CV")
     else:
-        merged_df = merged_df.drop(['subject'], axis=1)
+        merged_df = merged_df.drop(['subject_id'], axis=1)
 
     # Check if CUDA is available
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
