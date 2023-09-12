@@ -72,7 +72,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
         encoded_groups = encoder.fit_transform(merged_df['subject_id'].values)
 
         # Get most frequently occurring integer(encoded to subject id) label for each window
-        frequent_labels = sliding_window_get_sub_id(encoded_groups, look_back=50)
+        frequent_labels = sliding_window_get_sub_id(encoded_groups, look_back=look_back)
 
         # If you want the string labels back, decode the integer labels
         groups = encoder.inverse_transform(frequent_labels)
