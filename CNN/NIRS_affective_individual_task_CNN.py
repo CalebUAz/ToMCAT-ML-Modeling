@@ -45,7 +45,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Preprocess data
-    features = merged_df.iloc[:, :-2].values
+    features = merged_df.iloc[:, :pos[0]].values
     arousal_score = LabelEncoder().fit_transform(merged_df.iloc[:, pos[0]] + 2)  # Mapping -2 -> 0, -1 -> 1, 0 -> 2, 1 -> 3, 2 -> 4
     valence_score = LabelEncoder().fit_transform(merged_df.iloc[:, pos[1]] + 2)  # Same mapping for valence_score
     targets = list(zip(arousal_score, valence_score))
