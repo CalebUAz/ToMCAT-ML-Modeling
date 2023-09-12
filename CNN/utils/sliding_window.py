@@ -35,3 +35,19 @@ def sliding_window_no_overlap(signals, valence, arousal, **options):
     dataArousalScore = [np.argmax(np.bincount(x)) for x in dataArousalScore]
 
     return np.array(dataX), np.array(dataValenceScore), np.array(dataArousalScore)
+
+
+def sliding_window_get_sub_id(subject_id, **options):
+    """Convert an array of X, Y values into a dataset matrix for a CNN"""
+
+    look_back = options.pop('look_back', None)
+    dataX =  []
+
+    for i in range(0, len(subject_id) - look_back, look_back):  # Skip by 'look_back' for non-overlapping window
+        a = subject_id[i:(i+look_back)]
+        dataX.append(a)
+
+    # Generate a single most frequently occurring subject id for each window
+    dataX = [np.argmax(np.bincount(x)) for x in dataX]
+
+    return np.array(dataX)
