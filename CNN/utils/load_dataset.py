@@ -76,7 +76,7 @@ def load_dataset_NIRS(path):
                         
                         if df.shape[1] == 42:
                             dfs.append(df)
-                            subject_ids.append(folder)
+                            subject_ids.append(folder + '_' + station)
                             count += 1
             
     print("-------------------------")
