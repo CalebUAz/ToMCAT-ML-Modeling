@@ -15,7 +15,7 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
         train_data = Subset(dataset, train_indices)
         test_data = Subset(dataset, test_indices)
         train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
-        test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
+        test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=True)
 
         # Training
         model.train()
