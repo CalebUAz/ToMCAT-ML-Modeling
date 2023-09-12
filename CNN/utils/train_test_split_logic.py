@@ -1,3 +1,5 @@
+import numpy as np
+
 def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_size, model, criterion, optimizer, time, tqdm, Subset, DataLoader, torch):
     # Perform k-fold cross-validation
     fold_losses = []
@@ -82,6 +84,7 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
 
 
 def train_test_split_subject_holdout(group_split,groups, targets, dataset, num_folds, num_epochs, batch_size, input_size, model, criterion, optimizer, time, tqdm, Subset, DataLoader, torch, features):
+
     # Perform k-fold cross-validation
     fold_losses = []
     fold_accuracies = []
@@ -89,6 +92,23 @@ def train_test_split_subject_holdout(group_split,groups, targets, dataset, num_f
     all_true_valence, all_pred_valence = [], []
 
     for fold, (train_indices, test_indices) in enumerate(group_split.split(features, targets, groups)):
+
+        # Extract subject_ids for this fold
+        train_subjects = np.unique(groups[train_indices])
+        test_subjects = np.unique(groups[test_indices])
+        
+        # Store in the dictionary
+        fold_subjects = {}
+        fold_subjects[fold] = {
+            'train': train_subjects,
+            'test': test_subjects
+        }
+
+        # Print
+        print(f"Fold {fold+1}")
+        print(f"Training subjects: {train_subjects}")
+        print(f"Testing subjects: {test_subjects}")
+        print("-"*40)
         fold_start_time = time.time() #log the start time of the fold
         print(f"Fold {fold+1}/{num_folds}")
 
