@@ -67,7 +67,15 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
         # Use 80% of the subjects for training
         group_split = GroupShuffleSplit(n_splits=num_folds, train_size=0.8, random_state=42)
         groups = merged_df['subject_id'].values
-        groups = sliding_window_get_sub_id(groups, look_back=look_back)
+        # Convert string labels to integer labels using LabelEncoder
+        encoder = LabelEncoder()
+        encoded_groups = encoder.fit_transform(merged_df['subject_id'].values)
+
+        # Get most frequently occurring integer(encoded to subject id) label for each window
+        frequent_labels = sliding_window_get_sub_id(encoded_groups, look_back=50)
+
+        # If you want the string labels back, decode the integer labels
+        groups = encoder.inverse_transform(frequent_labels)
     else:
         kfold = KFold(n_splits=num_folds, shuffle=True, random_state=42)
 
