@@ -20,7 +20,7 @@ import seaborn as sns
 from sklearn.model_selection import GroupShuffleSplit
 from utils import save_plot_with_timestamp, sliding_window, load_dataset_NIRS, sliding_window_no_overlap, train_test_split, train_test_split, train_test_split_subject_holdout, sliding_window_get_sub_id
 
-def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout):
+def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size):
 
     # Create the output folder if it doesn't exist
     output_folder = 'output'
@@ -51,7 +51,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     targets = list(zip(arousal_score, valence_score))
 
     # Get images from sliding window
-    look_back = 30
+    look_back = window_size
     # features, valence, arousal = sliding_window(features, valence_score, arousal_score, look_back=look_back)
     features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, look_back=look_back)
     targets = list(zip(valence, arousal))
@@ -174,6 +174,10 @@ if __name__ == "__main__":
         "--subject_holdout", type=bool, default=False, help="Use subject holdout for CV"
     )
 
+    parser.add_argument(
+        "--window_size", type=int, default=10, help="Use subject holdout for CV"
+    )
+
     args = parser.parse_args()
     path = args.p
     hidden_size = args.hidden_size
@@ -181,5 +185,6 @@ if __name__ == "__main__":
     batch_size = args.batch_size
     learning_rate = args.learning_rate
     subject_holdout = args.subject_holdout
+    window_size = args.window_size
 
-    sys.exit(classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout))
+    sys.exit(classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size))
