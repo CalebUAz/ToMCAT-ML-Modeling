@@ -99,7 +99,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
             
             self.drop = nn.Dropout(0.5)
             
-            reduced_dim = input_shape[0]//8 * input_shape[1]//8 * 128  # Assuming pooling is done three times
+            reduced_dim = input_shape[0] * input_shape[1] * 128  # Assuming pooling is done three times
             self.fc1 = nn.Linear(reduced_dim, 128)  
             self.fc_arousal = nn.Linear(128, num_classes)
             self.fc_valence = nn.Linear(128, num_classes)
