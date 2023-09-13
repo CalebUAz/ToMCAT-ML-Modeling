@@ -108,6 +108,9 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
             x = self.pool1(nn.ReLU()(self.bn1(self.conv1(x))))
             x = self.pool2(nn.ReLU()(self.bn2(self.conv2(x))))
             x = self.pool3(nn.ReLU()(self.bn3(self.conv3(x))))
+
+            print(x.size())
+
             
             x = x.view(x.size(0), -1)  # Flatten the tensor
             x = self.drop(nn.ReLU()(self.fc1(x)))
