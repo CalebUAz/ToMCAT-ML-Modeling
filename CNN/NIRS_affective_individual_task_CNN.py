@@ -6,6 +6,7 @@ import argparse
 import numpy as np
 import torch
 from torch import nn, optim
+import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader, TensorDataset, Subset
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -112,12 +113,12 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
             self.fc_valence = nn.Linear(128, num_classes)
 
         def forward(self, x):
-            x = self.pool1(nn.ReLU(self.bn1(self.conv1(x))))
-            x = self.pool2(nn.ReLU(self.bn2(self.conv2(x))))
-            x = self.pool3(nn.ReLU(self.bn3(self.conv3(x))))
+            x = self.pool1(F.relu(self.bn1(self.conv1(x))))
+            x = self.pool2(F.relu(self.bn2(self.conv2(x))))
+            x = self.pool3(F.relu(self.bn3(self.conv3(x))))
             
             x = x.view(x.size(0), -1)  # Flatten the tensor
-            x = self.drop(nn.ReLU(self.fc1(x)))
+            x = self.drop(F.relu(self.fc1(x)))
 
             arousal = self.fc_arousal(x)
             valence = self.fc_valence(x)
