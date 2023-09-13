@@ -5,6 +5,7 @@ import pandas as pd
 import argparse
 import numpy as np
 import torch
+import csv
 from torch import nn, optim
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader, TensorDataset, Subset
@@ -19,7 +20,7 @@ from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import GroupShuffleSplit
-from utils import save_plot_with_timestamp, sliding_window, load_dataset_NIRS, sliding_window_no_overlap, train_test_split, train_test_split, train_test_split_subject_holdout, sliding_window_get_sub_id
+from utils import save_plot_with_timestamp, sliding_window, load_dataset_NIRS, sliding_window_no_overlap, train_test_split, train_test_split, train_test_split_subject_holdout, sliding_window_get_sub_id, is_file_empty_or_nonexistent
 
 def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size):
 
@@ -31,6 +32,23 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
         except OSError as e:
             print(f"Error creating output folder: {e}")
             return
+        
+    # File path for the csv to log results
+    csv_file_path = os.path.join(output_folder, 'results.csv')
+
+    # Check if the file is empty or doesn't exist
+    if is_file_empty_or_nonexistent(csv_file_path):
+        # Write headers to the csv
+        # Headers for the csv
+        headers = [
+            "Datetime", "modality", "CV_method", "hidden_size", "num_epochs", 
+            "batch_size", "learning_rate", "valence_accuracy", "valence_std_dev", 
+            "arousal_accuracy", "arousal_std_dev", "total_loss", "cm_path_arousal", "cm_path_valence"
+        ]
+        with open(csv_file_path, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(headers)
+
         
     # Load dataset
     merged_df = load_dataset_NIRS(path)
@@ -168,7 +186,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     plt.title(f'NIRS-CNN: Confusion Matrix for Arousal\nHidden Size: {hidden_size}, Holdout method: {subject_holdout_str} , Window size: {look_back}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {np.mean(arousal_accuracies):.2f}%, std: {np.std(arousal_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
     plt.xlabel('Predicted')
     plt.ylabel('True')
-    save_plot_with_timestamp(plt, 'confusion_matrix_arousal', output_folder)
+    confusion_matrix_arousal_file_path = save_plot_with_timestamp(plt, 'confusion_matrix_arousal', output_folder)
 
     # Plotting confusion matrix for valence
     plt.figure(figsize=(20, 14))
@@ -176,7 +194,16 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     plt.title(f'NIRS-CNN: Confusion Matrix for Valence\nHidden Size: {hidden_size}, Holdout method: {subject_holdout_str}, Window size: {look_back}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {np.mean(arousal_accuracies):.2f}%, std: {np.std(valence_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
     plt.xlabel('Predicted')
     plt.ylabel('True')
-    save_plot_with_timestamp(plt, 'confusion_matrix_valence', output_folder)
+    confusion_matrix_valence_file_path = save_plot_with_timestamp(plt, 'confusion_matrix_valence', output_folder)
+
+    # Write results to csv
+    with open(csv_file_path, 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow([
+            time.strftime("%Y-%m-%d %H:%M:%S"), "NIRS", subject_holdout_str, hidden_size, num_epochs, 
+            batch_size, learning_rate, np.mean(valence_accuracies), np.std(valence_accuracies), 
+            np.mean(arousal_accuracies), np.std(arousal_accuracies), np.mean(fold_losses), confusion_matrix_arousal_file_path, confusion_matrix_valence_file_path
+        ])
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
