@@ -106,7 +106,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
 
             # Reduced dimensions after three rounds of pooling
             reduced_dim = input_shape[0]//8 * input_shape[1]//8 * 128
-            self.fc1 = nn.Linear(reduced_dim, 128)
+            self.fc1 = nn.Linear(1536, 128)
 
             # Fully connected layers for arousal and valence
             self.fc_arousal = nn.Linear(128, num_classes)
