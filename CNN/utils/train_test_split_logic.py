@@ -20,7 +20,7 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
         # Training
         model.train()
         for epoch in range(num_epochs):
-            progress_bar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{num_epochs}")
+            progress_bar = tqdm(train_loader, desc=f"Fold {fold} Epoch {epoch+1}/{num_epochs}")
             for i, (inputs, targets) in enumerate(progress_bar):
                 inputs = inputs.view(-1, 1, *input_size)
                 targets_arousal = targets[:, 0]
@@ -121,7 +121,7 @@ def train_test_split_subject_holdout(group_split,groups, targets, dataset, num_f
         # Training
         model.train()
         for epoch in range(num_epochs):
-            progress_bar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{num_epochs}")
+            progress_bar = tqdm(train_loader, desc=f"Fold {fold} Epoch {epoch+1}/{num_epochs}")
             for i, (inputs, targets) in enumerate(progress_bar):
                 inputs = inputs.view(-1, 1, *input_size)
                 targets_arousal = targets[:, 0]
