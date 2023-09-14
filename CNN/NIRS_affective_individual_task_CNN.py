@@ -72,7 +72,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     # Get images from sliding window
     look_back = window_size
     # features, valence, arousal = sliding_window(features, valence_score, arousal_score, look_back=look_back)
-    features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, look_back=look_back)
+    features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'eeg', look_back=look_back)
     targets = list(zip(valence, arousal))
 
     # Hyperparameters
