@@ -7,6 +7,11 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
     all_true_arousal, all_pred_arousal = [], []
     all_true_valence, all_pred_valence = [], []
 
+    best_loss = float('inf') # Initialize with a high value
+    patience_counter = 0 # Counter to keep track of number of epochs with no improvement in loss
+    delta=0.001 # Minimum change in the monitored quantity to qualify as an improvement
+    patience = 5 # Number of epochs with no improvement after which training will be stopped
+
     for fold, (train_indices, test_indices) in enumerate(kfold.split(dataset)):
         fold_start_time = time.time() #log the start time of the fold
         print(f"Fold {fold+1}/{num_folds}")
@@ -40,6 +45,17 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
                 optimizer.step()
 
                 progress_bar.set_postfix(loss=loss.item())
+
+                 # Early stopping logic
+                if loss.item() + delta < best_loss:
+                    best_loss = loss.item()
+                    patience_counter = 0  # Reset patience counter when there's an improvement
+                else:
+                    patience_counter += 1  # Increase patience counter if no improvement
+
+                if patience_counter >= patience:
+                    print("Early Stopping due to no improvement!")
+                    break
 
         fold_losses.append(loss.item())
         fold_end_time = time.time()
@@ -91,6 +107,11 @@ def train_test_split_subject_holdout(group_split,groups, targets, dataset, num_f
     all_true_arousal, all_pred_arousal = [], []
     all_true_valence, all_pred_valence = [], []
 
+    best_loss = float('inf') # Initialize with a high value
+    patience_counter = 0 # Counter to keep track of number of epochs with no improvement in loss
+    delta=0.001 # Minimum change in the monitored quantity to qualify as an improvement
+    patience = 5 # Number of epochs with no improvement after which training will be stopped
+
     for fold, (train_indices, test_indices) in enumerate(group_split.split(features, targets, groups)):
 
         # Extract subject_ids for this fold
@@ -141,6 +162,17 @@ def train_test_split_subject_holdout(group_split,groups, targets, dataset, num_f
                 optimizer.step()
 
                 progress_bar.set_postfix(loss=loss.item())
+
+                # Early stopping logic
+                if loss.item() + delta < best_loss:
+                    best_loss = loss.item()
+                    patience_counter = 0
+                else:
+                    patience_counter += 1
+
+                if patience_counter >= patience:
+                    print("Early Stopping due to no improvement!")
+                    break    
 
         fold_losses.append(loss.item())
         fold_end_time = time.time()
