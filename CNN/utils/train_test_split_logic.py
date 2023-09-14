@@ -9,7 +9,7 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
 
     best_loss = float('inf') # Initialize with a high value
     patience_counter = 0 # Counter to keep track of number of epochs with no improvement in loss
-    delta=0.001 # Minimum change in the monitored quantity to qualify as an improvement
+    delta=0.01 # Minimum change in the monitored quantity to qualify as an improvement
     patience = 5 # Number of epochs with no improvement after which training will be stopped
 
     for fold, (train_indices, test_indices) in enumerate(kfold.split(dataset)):
