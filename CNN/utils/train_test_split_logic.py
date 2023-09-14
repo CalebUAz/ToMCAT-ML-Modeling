@@ -53,9 +53,9 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
                 else:
                     patience_counter += 1  # Increase patience counter if no improvement
 
-                if patience_counter >= patience:
-                    print("Early Stopping due to no improvement!")
-                    break
+                # if patience_counter >= patience:
+                #     print("Early Stopping due to no improvement!")
+                #     break
 
         fold_losses.append(loss.item())
         fold_end_time = time.time()
@@ -170,9 +170,9 @@ def train_test_split_subject_holdout(group_split,groups, targets, dataset, num_f
                 else:
                     patience_counter += 1
 
-                if patience_counter >= patience:
-                    print("Early Stopping due to no improvement!")
-                    break    
+                # if patience_counter >= patience:
+                #     print("Early Stopping due to no improvement!")
+                #     break    
 
         fold_losses.append(loss.item())
         fold_end_time = time.time()
