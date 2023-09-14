@@ -100,7 +100,8 @@ def load_dataset_EEG(path):
     ignore_df = pd.read_csv('utils/ignore_experimenter.csv')
     
     directory = path
-    dfs = []
+    dfs = [] # List of dataframes
+    subject_ids = [] # Subject id for train test split logic
     headers = [
     "AFF1h", "F7", "FC5", "C3", "T7", "TP9", "Pz", "P3", "P7", "O1", "O2", "P8", "P4", "TP10", "Cz", "C4", "T8", "FC6", "FCz", "F8", "AFF2h", "GSR", "EKG", "arousal_score", "valence_score"]
 
@@ -155,6 +156,7 @@ def load_dataset_EEG(path):
                         
                         if df.shape[1] > 2:
                             dfs.append(df)
+                            subject_ids.append(folder + '_' + station)
                             count += 1
                         #else:
                             #print(df.shape, file_path)
@@ -164,5 +166,8 @@ def load_dataset_EEG(path):
     combined_df = pd.concat(dfs, ignore_index=True)
     combined_df = combined_df.set_axis(headers, axis=1)
     combined_df = combined_df[columns_to_keep]
+
+    # Subject id for train test split logic
+    combined_df['subject_id'] = np.concatenate([[subject] * len(df) for subject, df in zip(subject_ids, dfs)])
 
     return combined_df
