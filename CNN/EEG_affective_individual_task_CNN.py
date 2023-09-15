@@ -67,7 +67,8 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
     features = merged_df.iloc[:, :pos[0]].values
     arousal_score = LabelEncoder().fit_transform(merged_df.iloc[:, pos[0]] + 2)  # Mapping -2 -> 0, -1 -> 1, 0 -> 2, 1 -> 3, 2 -> 4
     valence_score = LabelEncoder().fit_transform(merged_df.iloc[:, pos[1]] + 2)  # Same mapping for valence_score
-    targets = list(zip(arousal_score, valence_score))
+    print("Arousal score labels:", np.unique(arousal_score), "Valence score labels:", np.unique(valence_score))
+    # targets = list(zip(arousal_score, valence_score))
 
     # Get images from sliding window
     look_back = window_size
