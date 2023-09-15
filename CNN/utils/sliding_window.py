@@ -25,9 +25,9 @@ def sliding_window_no_overlap(signals, valence, arousal, modality, **options):
     look_back = options.pop('look_back', None)
     dataX, dataValenceScore, dataArousalScore = [], [], []
 
-    if modality == 'eeg':
-        # Convert EEG signals to frequency bands
-        signals = get_eeg_frequency_band_data(signals)
+    # if modality == 'eeg':
+    #     # Convert EEG signals to frequency bands
+    #     signals = get_eeg_frequency_band_data(signals)
 
     for i in range(0, len(signals) - look_back, look_back):  # Skip by 'look_back' for non-overlapping window
         a = signals[i:(i+look_back)]
