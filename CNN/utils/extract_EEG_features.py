@@ -24,7 +24,7 @@ def get_eeg_frequency_band_data(signals):
 
     for band, (fmin, fmax) in bands.items():
         # Compute the PSD using mne's psd_multitaper method
-        psd, freqs = mne.time_frequency.psd_multitaper(raw, fmin=fmin, fmax=fmax, bandwidth=2, tmin=None, tmax=None, n_jobs=1)
+        psd, freqs = raw.compute_psd(fmin=fmin, fmax=fmax, bandwidth=2, tmin=None, tmax=None, n_jobs=1)
         
         # Average the PSD values across the frequencies within the band limits
         band_psd = psd.mean(axis=1)
