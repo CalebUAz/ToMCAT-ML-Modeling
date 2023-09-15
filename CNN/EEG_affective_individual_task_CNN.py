@@ -231,7 +231,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--window_size", type=int, default=10, help="Use subject holdout for CV"
+        "--window_size", type=int, default=500, help="Use subject holdout for CV"
     )
 
     args = parser.parse_args()
