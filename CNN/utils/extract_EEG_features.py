@@ -28,7 +28,7 @@ def get_eeg_frequency_band_data(signals):
         filtered_data = raw.copy().filter(fmin, fmax).get_data()
         all_band_data.append(filtered_data)
     
-    # Horizontally stack all band data
-    stacked_data = np.hstack(all_band_data)
+    # Concatenate all frequency bands side by side (along channels axis)
+    stacked_data = np.concatenate(all_band_data, axis=0)
     
     return stacked_data.T
