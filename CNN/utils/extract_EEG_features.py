@@ -1,7 +1,7 @@
 import mne
 import numpy as np
 
-def get_eeg_frequency_band_data(signals, look_back):
+def get_eeg_frequency_band_data(signals):
     # Frequency bands definitions
     bands = {
         'Delta': (1, 4),
@@ -11,22 +11,24 @@ def get_eeg_frequency_band_data(signals, look_back):
         'Gamma': (30, 40)
     }
     sfreq = 500
-    dataX = []
+    signals = signals.T
+    # Create channel names for MNE object
+    n_channels = signals.shape[0]
+    ch_names = ["eeg_channel_{}".format(i) for i in range(n_channels)]
     
-    # Load your EEG data into an mne object (this assumes signals is a 1D array)
-    info = mne.create_info(ch_names=["eeg_channel"], sfreq=sfreq, ch_types=["eeg"])
-    raw = mne.io.RawArray([signals], info)
-    
-    for i in range(0, len(signals) - look_back, look_back):
-        combined_bands = []
-        
-        for band, (fmin, fmax) in bands.items():
-            filtered_signals = raw.copy().filter(fmin, fmax).get_data()[0]
-            a_band = filtered_signals[i:(i+look_back)]
-            combined_bands.append(a_band)
-        
-        # Horizontally stack bands for this window
-        window_data = np.hstack(combined_bands)
-        dataX.append(window_data)
+    # Load your EEG data into an mne object
+    info = mne.create_info(ch_names=ch_names, sfreq=sfreq, ch_types=["eeg"] * n_channels)
+    raw = mne.io.RawArray(signals, info)
 
-    return dataX
+    # List to store the filtered data for each band
+    all_band_data = []
+    
+    # Apply band-pass filters for each frequency band and store in the list
+    for band, (fmin, fmax) in bands.items():
+        filtered_data = raw.copy().filter(fmin, fmax).get_data()
+        all_band_data.append(filtered_data)
+    
+    # Horizontally stack all band data
+    stacked_data = np.hstack(all_band_data)
+    
+    return stacked_data.T
