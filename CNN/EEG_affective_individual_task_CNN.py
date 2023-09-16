@@ -110,7 +110,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             self.bn1 = nn.BatchNorm2d(16)
             
             # Depthwise convolution
-            self.conv2 = nn.Conv2d(16, 32, (features.shape[1], 1), groups=16, bias=False)
+            self.conv2 = nn.Conv2d(16, 32, (features.shape[2], 1), groups=16, bias=False)
             self.bn2 = nn.BatchNorm2d(32)
             self.pool2 = nn.AvgPool2d((1, 4))
             self.drop2 = nn.Dropout(0.25)
@@ -121,16 +121,19 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             self.pool3 = nn.AvgPool2d((1, 8))
             self.drop3 = nn.Dropout(0.25)
             
-            # Calculate flattened size
-            self.flattened_size = 32 * 1 * 137
+            # Dummy forward pass to calculate the number of features
+            x = torch.zeros(1, 1, features.shape[2], features.shape[0])
+            x = self.drop2(self.pool2(F.elu(self.bn2(self.conv2(F.elu(self.bn1(self.conv1(x))))))))
+            x = self.drop3(self.pool3(F.elu(self.bn3(self.conv3(x)))))
+            self.flattened_size = x.view(-1).size(0)
             
             self.fc1 = nn.Linear(self.flattened_size, 128)
-            self.drop_fc = nn.Dropout(0.5)  
+            self.drop_fc = nn.Dropout(0.5)
 
             # Fully connected layers for arousal and valence
-            self.fc_arousal = nn.Linear(128, num_classes)
-            self.fc_valence = nn.Linear(128, num_classes)
-
+            self.fc_arousal = nn.Linear(128, 1)
+            self.fc_valence = nn.Linear(128, 1)
+            
         def forward(self, x):
             # Layer 1
             x = F.elu(self.bn1(self.conv1(x)))
@@ -151,6 +154,8 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             valence = self.fc_valence(x)
 
             return arousal, valence
+
+
 
     # Initialize model, loss, and optimizer
     model = CNN(input_size, num_classes).to(device)  # Move the model to the GPU
