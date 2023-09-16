@@ -13,32 +13,23 @@ def get_eeg_frequency_band_data(signals):
     
     sfreq = 500
     signals = signals.T
+    # Create channel names for MNE object
     n_channels = signals.shape[0]
     ch_names = ["eeg_channel_{}".format(i) for i in range(n_channels)]
+
+    # Load your EEG data into an mne object
     info = mne.create_info(ch_names=ch_names, sfreq=sfreq, ch_types=["eeg"] * n_channels)
     raw = mne.io.RawArray(signals, info)
 
-    # Lists to store the PSD and DE features for each band
-    all_psd_data = []
-    all_de_data = []
+    # List to store the filtered data for each band
+    all_band_data = []
 
+    # Apply band-pass filters for each frequency band and store in the list
     for band, (fmin, fmax) in bands.items():
-        # Compute the PSD using mne's psd_multitaper method
-        psd, freqs = raw.compute_psd(fmin=fmin, fmax=fmax, bandwidth=2, tmin=None, tmax=None, n_jobs=1)
-        
-        # Average the PSD values across the frequencies within the band limits
-        band_psd = psd.mean(axis=1)
-        all_psd_data.append(band_psd)
-        
-        # Compute Differential Entropy (DE)
-        normalized_psd = band_psd / band_psd.sum()
-        de = -np.sum(normalized_psd * np.log2(normalized_psd), axis=1)
-        all_de_data.append(de)
+        filtered_data = raw.copy().filter(fmin, fmax).get_data()
+        all_band_data.append(filtered_data)
 
-    # Stack the features side by side
-    stacked_psd_data = np.vstack(all_psd_data)
-    stacked_de_data = np.vstack(all_de_data)
-
-    stacked_data = np.vstack([stacked_psd_data, stacked_de_data])
+    # Concatenate all frequency bands side by side (along channels axis)
+    stacked_data = np.concatenate(all_band_data, axis=0)
 
     return stacked_data.T
