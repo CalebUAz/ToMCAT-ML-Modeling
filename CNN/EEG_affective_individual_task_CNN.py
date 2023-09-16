@@ -116,7 +116,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
             # Conv Layer 3
-            self.conv3 = nn.Conv2d(64, 128, kernel_size=(7, 7), stride=1, padding=3)
+            self.conv3 = nn.Conv2d(64, 128, kernel_size=(7, 7), stride=1, padding=0)
             self.bn3 = nn.BatchNorm2d(128)
             self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
             
