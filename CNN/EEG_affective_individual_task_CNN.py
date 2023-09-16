@@ -110,7 +110,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             self.bn1 = nn.BatchNorm2d(16)
             
             # Depthwise convolution
-            self.conv2 = nn.Conv2d(16, 32, (num_channels, 1), groups=16, bias=False)
+            self.conv2 = nn.Conv2d(16, 32, (input_shape[1], 1), groups=16, bias=False)
             self.bn2 = nn.BatchNorm2d(32)
             self.pool2 = nn.AvgPool2d((1, 4))
             self.drop2 = nn.Dropout(0.25)
