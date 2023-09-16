@@ -122,10 +122,24 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             self.drop3 = nn.Dropout(0.25)
             
             # Dummy forward pass to calculate the number of features
-            x = torch.zeros(1, 1, features.shape[2], features.shape[0])
-            x = self.drop2(self.pool2(F.elu(self.bn2(self.conv2(F.elu(self.bn1(self.conv1(x))))))))
-            x = self.drop3(self.pool3(F.elu(self.bn3(self.conv3(x)))))
+            x = torch.zeros(1, 1, input_shape[1], input_shape[2])
+            print("Initial shape:", x.shape)
+            
+            x = F.elu(self.bn1(self.conv1(x)))
+            print("After conv1:", x.shape)
+            
+            x = F.elu(self.bn2(self.conv2(x)))
+            print("After conv2:", x.shape)
+            x = self.drop2(self.pool2(x))
+            print("After pool2:", x.shape)
+            
+            x = F.elu(self.bn3(self.conv3(x)))
+            print("After conv3:", x.shape)
+            x = self.drop3(self.pool3(x))
+            print("After pool3:", x.shape)
+
             self.flattened_size = x.view(-1).size(0)
+            print("Flattened size:", self.flattened_size)
             
             self.fc1 = nn.Linear(self.flattened_size, 128)
             self.drop_fc = nn.Dropout(0.5)
@@ -148,6 +162,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             
             # FC Layers
             x = x.view(x.size(0), -1)
+            print("Before FC:", x.shape)
             x = self.drop_fc(F.relu(self.fc1(x)))
 
             arousal = self.fc_arousal(x)
