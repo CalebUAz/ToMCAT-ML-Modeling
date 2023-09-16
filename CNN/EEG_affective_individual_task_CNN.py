@@ -146,15 +146,14 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             x = F.elu(self.bn3(self.conv3(x)))
             x = self.drop3(self.pool3(x))
             
-            x = x.view(x.size(0), -1)  # Flatten the tensor
-            x = self.drop(F.relu(self.fc1(x)))
+            # FC Layers
+            x = x.view(x.size(0), -1)
+            x = self.drop_fc(F.relu(self.fc1(x)))
 
             arousal = self.fc_arousal(x)
             valence = self.fc_valence(x)
 
             return arousal, valence
-
-
 
     # Initialize model, loss, and optimizer
     model = CNN(input_size, num_classes).to(device)  # Move the model to the GPU
