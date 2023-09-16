@@ -141,7 +141,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             self.flattened_size = x.view(-1).size(0)
             print("Flattened size:", self.flattened_size)
             
-            self.fc1 = nn.Linear(self.flattened_size, 128)
+            self.fc1 = nn.Linear(4384, 128)
             self.drop_fc = nn.Dropout(0.5)
 
             # Fully connected layers for arousal and valence
