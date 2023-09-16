@@ -145,8 +145,8 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             self.drop_fc = nn.Dropout(0.5)
 
             # Fully connected layers for arousal and valence
-            self.fc_arousal = nn.Linear(128, 1)
-            self.fc_valence = nn.Linear(128, 1)
+            self.fc_arousal = nn.Linear(128, num_classes)
+            self.fc_valence = nn.Linear(128, num_classes)
             
         def forward(self, x):
             # Layer 1
