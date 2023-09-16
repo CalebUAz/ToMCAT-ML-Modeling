@@ -106,22 +106,22 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             super(CNN, self).__init__()
 
             # Conv Layer 1
-            self.conv1 = nn.Conv2d(1, 32, kernel_size=(3, 3), stride=1, padding=1)
+            self.conv1 = nn.Conv2d(7, 32, kernel_size=(3, 1), stride=1, padding=(1, 0))
             self.bn1 = nn.BatchNorm2d(32)
-            self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+            self.pool1 = nn.MaxPool2d(kernel_size=(2, 1), stride=(2, 1))
 
             # Conv Layer 2
-            self.conv2 = nn.Conv2d(32, 64, kernel_size=(5, 5), stride=1, padding=2)
+            self.conv2 = nn.Conv2d(32, 64, kernel_size=(5, 1), stride=1, padding=(2, 0))
             self.bn2 = nn.BatchNorm2d(64)
-            self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
+            self.pool2 = nn.MaxPool2d(kernel_size=(2, 1), stride=(2, 1))
 
-            # Conv Layer 3 - change the kernel size to 3x3 and adjust the padding.
-            self.conv3 = nn.Conv2d(64, 128, kernel_size=(3, 3), stride=1, padding=1)
+            # Conv Layer 3
+            self.conv3 = nn.Conv2d(64, 128, kernel_size=(3, 1), stride=1, padding=(1, 0))
             self.bn3 = nn.BatchNorm2d(128)
-            self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
+            self.pool3 = nn.MaxPool2d(kernel_size=(2, 1), stride=(2, 1))
             
             # Dummy forward pass to calculate the number of features
-            x = torch.zeros(1, 1, input_shape[0], input_shape[1])  
+            x = torch.zeros(1, 7, input_shape[0], input_shape[1])
             x = self.pool1(F.relu(self.bn1(self.conv1(x))))
             x = self.pool2(F.relu(self.bn2(self.conv2(x))))
             x = self.pool3(F.relu(self.bn3(self.conv3(x))))
@@ -148,6 +148,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             valence = self.fc_valence(x)
 
             return arousal, valence
+
 
 
 
