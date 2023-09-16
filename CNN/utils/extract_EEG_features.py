@@ -4,11 +4,11 @@ import numpy as np
 def get_eeg_frequency_band_data(signals):
     # Frequency bands definitions
     bands = {
-        'Delta': (1, 4),
-        'Theta': (4, 8),
-        'Alpha': (8, 14),
+        #'Delta': (1, 4),
+        #'Theta': (4, 8),
+        #'Alpha': (8, 14),
         'Beta': (14, 30),
-        'Gamma': (30, 50)  # Adjusted upper limit to 50Hz for gamma
+        #'Gamma': (30, 50)  # Adjusted upper limit to 50Hz for gamma
     }
     
     sfreq = 500
