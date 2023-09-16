@@ -122,7 +122,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             self.drop3 = nn.Dropout(0.25)
             
             # Dummy forward pass to calculate the number of features
-            x = torch.zeros(1, 1, input_shape[1], input_shape[2])
+            x = torch.zeros(1, 1, features.shape[2], features.shape[0])
             print("Initial shape:", x.shape)
             
             x = F.elu(self.bn1(self.conv1(x)))
