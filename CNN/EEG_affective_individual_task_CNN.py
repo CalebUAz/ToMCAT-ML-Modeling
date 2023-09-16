@@ -106,7 +106,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             super(CNN, self).__init__()
 
             # Conv Layer 1
-            self.conv1 = nn.Conv2d(7, 32, kernel_size=(3, 1), stride=1, padding=(1, 0))
+            self.conv1 = nn.Conv2d(1, 32, kernel_size=(3, 1), stride=1, padding=(1, 0))
             self.bn1 = nn.BatchNorm2d(32)
             self.pool1 = nn.MaxPool2d(kernel_size=(2, 1), stride=(2, 1))
 
@@ -148,9 +148,6 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             valence = self.fc_valence(x)
 
             return arousal, valence
-
-
-
 
     # Initialize model, loss, and optimizer
     model = CNN(input_size, num_classes).to(device)  # Move the model to the GPU
