@@ -115,7 +115,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             self.pooling2 = nn.AvgPool2d((1, 4))
             
             # Layer 3
-            self.conv3 = nn.Conv2d(32, 32, (1, 16))
+            self.conv3 = nn.Conv2d(32, 32, (1, 8))
             self.batchnorm3 = nn.BatchNorm2d(32, False)
             self.pooling3 = nn.AvgPool2d((1, 8))
             
@@ -145,7 +145,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             x = nn.Dropout(0.25)(x)
             
             # FC Layers
-            x = x.view(-1, 32*2)  # Flattening
+            x = x.view(-1, 32)  # Flattening
             
             arousal = self.fc_arousal(x)
             valence = self.fc_valence(x)
