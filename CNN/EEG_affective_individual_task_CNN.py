@@ -105,51 +105,48 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
         def __init__(self, input_shape, num_classes):
             super(CNN, self).__init__()
 
-            # Layer 1
-            self.conv1 = nn.Conv2d(1, 16, (1, 35), padding=(0, 17))
-            self.batchnorm1 = nn.BatchNorm2d(16, False)
+            # Conv Layer 1
+            self.conv1 = nn.Conv2d(1, 32, kernel_size=(3, 3), stride=1, padding=1)
+            self.bn1 = nn.BatchNorm2d(32)
+            self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+
+            # Conv Layer 2
+            self.conv2 = nn.Conv2d(32, 64, kernel_size=(5, 5), stride=1, padding=2)
+            self.bn2 = nn.BatchNorm2d(64)
+            self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
+
+            # Conv Layer 3
+            self.conv3 = nn.Conv2d(64, 128, kernel_size=(7, 7), stride=1, padding=3)
+            self.bn3 = nn.BatchNorm2d(128)
+            self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
             
-            # Layer 2
-            self.conv2 = nn.Conv2d(16, 32, (500, 1), groups=16)
-            self.batchnorm2 = nn.BatchNorm2d(32, False)
-            self.pooling2 = nn.AvgPool2d((1, 4))
-            
-            # Layer 3
-            self.conv3 = nn.Conv2d(32, 32, (1, 8))
-            self.batchnorm3 = nn.BatchNorm2d(32, False)
-            self.pooling3 = nn.AvgPool2d((1, 1))
-            
-            # FC Layers for arousal and valence
-            self.fc_arousal = nn.Linear(32*2, num_classes)
-            self.fc_valence = nn.Linear(32*2, num_classes)
-            
+            # Dummy forward pass to calculate the number of features
+            x = torch.zeros(1, 1, input_shape[0], input_shape[1])  # 1 is for batch size and channels
+            x = self.pool1(F.relu(self.bn1(self.conv1(x))))
+            x = self.pool2(F.relu(self.bn2(self.conv2(x))))
+            x = self.pool3(F.relu(self.bn3(self.conv3(x))))
+            self.flattened_size = x.view(-1).size(0)
+
+            # Dropout
+            self.drop = nn.Dropout(0.5)
+
+            self.fc1 = nn.Linear(self.flattened_size, 128)  
+
+            # Fully connected layers for arousal and valence
+            self.fc_arousal = nn.Linear(128, num_classes)
+            self.fc_valence = nn.Linear(128, num_classes)
+
         def forward(self, x):
-            # Layer 1
-            x = self.conv1(x)
-            x = self.batchnorm1(x)
-            x = nn.ELU()(x)
-            x = nn.Dropout(0.25)(x)
+            x = self.pool1(F.relu(self.bn1(self.conv1(x))))
+            x = self.pool2(F.relu(self.bn2(self.conv2(x))))
+            x = self.pool3(F.relu(self.bn3(self.conv3(x))))
             
-            # Layer 2
-            x = self.conv2(x)
-            x = self.batchnorm2(x)
-            x = nn.ELU()(x)
-            x = self.pooling2(x)
-            x = nn.Dropout(0.25)(x)
-            
-            # Layer 3
-            x = self.conv3(x)
-            x = self.batchnorm3(x)
-            x = nn.ELU()(x)
-            x = self.pooling3(x)
-            x = nn.Dropout(0.25)(x)
-            
-            # FC Layers
-            x = x.view(-1, 32)  # Flattening
-            
+            x = x.view(x.size(0), -1)  # Flatten the tensor
+            x = self.drop(F.relu(self.fc1(x)))
+
             arousal = self.fc_arousal(x)
             valence = self.fc_valence(x)
-            
+
             return arousal, valence
 
 
