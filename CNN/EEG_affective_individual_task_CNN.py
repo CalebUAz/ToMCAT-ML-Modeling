@@ -110,7 +110,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             self.bn1 = nn.BatchNorm2d(16)
             
             # Depthwise convolution
-            self.conv2 = nn.Conv2d(16, 32, (input_shape[1], 1), groups=16, bias=False)
+            self.conv2 = nn.Conv2d(16, 32, (features.shape[1], 1), groups=16, bias=False)
             self.bn2 = nn.BatchNorm2d(32)
             self.pool2 = nn.AvgPool2d((1, 4))
             self.drop2 = nn.Dropout(0.25)
@@ -122,16 +122,13 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             self.drop3 = nn.Dropout(0.25)
             
             # Dummy forward pass to calculate the number of features
-            x = torch.zeros(1, 1, input_shape[0], input_shape[1])  # 1 is for batch size and channels
-            x = self.pool1(F.relu(self.bn1(self.conv1(x))))
-            x = self.pool2(F.relu(self.bn2(self.conv2(x))))
-            x = self.pool3(F.relu(self.bn3(self.conv3(x))))
+            x = torch.zeros(1, 1, features.shape[1], features.shape[0])
+            x = self.drop2(self.pool2(F.elu(self.bn2(self.conv2(F.elu(self.bn1(self.conv1(x))))))))
+            x = self.drop3(self.pool3(F.elu(self.bn3(self.conv3(x)))))
             self.flattened_size = x.view(-1).size(0)
-
-            # Dropout
-            #self.drop = nn.Dropout(0.5)
-
-            self.fc1 = nn.Linear(self.flattened_size, 128)  
+            
+            self.fc1 = nn.Linear(self.flattened_size, 128)
+            self.drop_fc = nn.Dropout(0.5)  
 
             # Fully connected layers for arousal and valence
             self.fc_arousal = nn.Linear(128, num_classes)
