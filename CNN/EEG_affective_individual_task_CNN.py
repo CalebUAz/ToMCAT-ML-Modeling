@@ -106,68 +106,50 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             super(CNN, self).__init__()
 
             # Layer 1
-            self.conv1 = nn.Conv2d(1, 16, (1, 51), padding=(0, 25), bias=False)
-            self.bn1 = nn.BatchNorm2d(16)
+            self.conv1 = nn.Conv2d(1, 16, (1, 35), padding=(0, 17))
+            self.batchnorm1 = nn.BatchNorm2d(16, False)
             
-            # Depthwise convolution
-            self.conv2 = nn.Conv2d(16, 32, (features.shape[2], 1), groups=16, bias=False)
-            self.bn2 = nn.BatchNorm2d(32)
-            self.pool2 = nn.AvgPool2d((1, 4))
-            self.drop2 = nn.Dropout(0.25)
+            # Layer 2
+            self.conv2 = nn.Conv2d(16, 32, (500, 1), groups=16)
+            self.batchnorm2 = nn.BatchNorm2d(32, False)
+            self.pooling2 = nn.AvgPool2d((1, 4))
             
-            # Separable convolution
-            self.conv3 = nn.Conv2d(32, 32, (1, 15), padding=(0, 7), bias=False)
-            self.bn3 = nn.BatchNorm2d(32)
-            self.pool3 = nn.AvgPool2d((1, 8))
-            self.drop3 = nn.Dropout(0.25)
+            # Layer 3
+            self.conv3 = nn.Conv2d(32, 32, (1, 16))
+            self.batchnorm3 = nn.BatchNorm2d(32, False)
+            self.pooling3 = nn.AvgPool2d((1, 8))
             
-            # Dummy forward pass to calculate the number of features
-            x = torch.zeros(1, 1, features.shape[2], features.shape[0])
-            print("Initial shape:", x.shape)
-            
-            x = F.elu(self.bn1(self.conv1(x)))
-            print("After conv1:", x.shape)
-            
-            x = F.elu(self.bn2(self.conv2(x)))
-            print("After conv2:", x.shape)
-            x = self.drop2(self.pool2(x))
-            print("After pool2:", x.shape)
-            
-            x = F.elu(self.bn3(self.conv3(x)))
-            print("After conv3:", x.shape)
-            x = self.drop3(self.pool3(x))
-            print("After pool3:", x.shape)
-
-            self.flattened_size = x.view(-1).size(0)
-            print("Flattened size:", self.flattened_size)
-            
-            self.fc1 = nn.Linear(4384, 128)
-            self.drop_fc = nn.Dropout(0.5)
-
-            # Fully connected layers for arousal and valence
-            self.fc_arousal = nn.Linear(128, num_classes)
-            self.fc_valence = nn.Linear(128, num_classes)
+            # FC Layers for arousal and valence
+            self.fc_arousal = nn.Linear(32*2, num_classes)
+            self.fc_valence = nn.Linear(32*2, num_classes)
             
         def forward(self, x):
             # Layer 1
-            x = F.elu(self.bn1(self.conv1(x)))
+            x = self.conv1(x)
+            x = self.batchnorm1(x)
+            x = nn.ELU()(x)
+            x = nn.Dropout(0.25)(x)
             
-            # Depthwise Convolution
-            x = F.elu(self.bn2(self.conv2(x)))
-            x = self.drop2(self.pool2(x))
+            # Layer 2
+            x = self.conv2(x)
+            x = self.batchnorm2(x)
+            x = nn.ELU()(x)
+            x = self.pooling2(x)
+            x = nn.Dropout(0.25)(x)
             
-            # Separable Convolution
-            x = F.elu(self.bn3(self.conv3(x)))
-            x = self.drop3(self.pool3(x))
+            # Layer 3
+            x = self.conv3(x)
+            x = self.batchnorm3(x)
+            x = nn.ELU()(x)
+            x = self.pooling3(x)
+            x = nn.Dropout(0.25)(x)
             
             # FC Layers
-            x = x.view(x.size(0), -1)
-            print("Before FC:", x.shape)
-            x = self.drop_fc(F.relu(self.fc1(x)))
-
+            x = x.view(-1, 32*2)  # Flattening
+            
             arousal = self.fc_arousal(x)
             valence = self.fc_valence(x)
-
+            
             return arousal, valence
 
 
