@@ -82,7 +82,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
     num_folds = 5
 
     # Create DataLoaders
-    features = features.squeeze(1)
+    features = features.unsqueeze(1)
     dataset = TensorDataset(torch.tensor(features).float().to(device), torch.tensor(targets).long().to(device))
     if subject_holdout:
         # Use 80% of the subjects for training
