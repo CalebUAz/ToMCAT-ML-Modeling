@@ -82,7 +82,6 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
     num_folds = 5
 
     # Create DataLoaders
-    features = features.unsqueeze(1)
     dataset = TensorDataset(torch.tensor(features).float().to(device), torch.tensor(targets).long().to(device))
     if subject_holdout:
         # Use 80% of the subjects for training
@@ -107,14 +106,14 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             super(CNN, self).__init__()
 
             self.layer1 = nn.Sequential(
-            nn.Conv2d(in_channels=7, out_channels=16, kernel_size=(5,3), stride=1, padding=(2,1)),
+            nn.Conv2d(in_channels=7, out_channels=16, kernel_size=5, stride=1, padding=2),
             nn.BatchNorm2d(16),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=(2,2), stride=2)
+            nn.MaxPool2d(kernel_size=2, stride=2)
         )
         
             self.layer2 = nn.Sequential(
-                nn.Conv2d(in_channels=16, out_channels=32, kernel_size=(5,3), stride=1, padding=(2,1)),
+                nn.Conv2d(in_channels=16, out_channels=32, kernel_size=5, stride=1, padding=2),
                 nn.BatchNorm2d(32),
                 nn.ReLU(),
                 nn.MaxPool2d(kernel_size=(2,2), stride=2)
@@ -132,7 +131,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             out = self.layer2(out)
             # If you add more layers, add their forward passes here
             out = out.reshape(out.size(0), -1)
-            out = self.fc1(out)
+            x = self.fc1(out)
 
             arousal = self.fc_arousal(x)
             valence = self.fc_valence(x)
