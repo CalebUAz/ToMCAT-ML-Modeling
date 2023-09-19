@@ -22,7 +22,7 @@ import seaborn as sns
 from sklearn.model_selection import GroupShuffleSplit
 from utils import save_plot_with_timestamp, sliding_window, load_dataset_NIRS, sliding_window_no_overlap, train_test_split, train_test_split, train_test_split_subject_holdout, sliding_window_get_sub_id, is_file_empty_or_nonexistent
 
-def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size):
+def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, window_overlap):
 
     # Create the output folder if it doesn't exist
     output_folder = 'output'
@@ -71,8 +71,14 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
 
     # Get images from sliding window
     look_back = window_size
-    # features, valence, arousal = sliding_window(features, valence_score, arousal_score, look_back=look_back)
-    features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'nirs', look_back=look_back)
+
+    if window_overlap:
+        features, valence, arousal = sliding_window(features, valence_score, arousal_score, look_back=look_back)
+        window_overlap_str = True
+    else:
+        features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'nirs', look_back=look_back)
+        window_overlap_str = False
+
     targets = list(zip(valence, arousal))
 
     # Hyperparameters
@@ -183,7 +189,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     # Plotting confusion matrix for arousal
     plt.figure(figsize=(20, 14))
     sns.heatmap(arousal_cm, annot=True, fmt='d', xticklabels=class_names, yticklabels=class_names, cmap='Blues', annot_kws={"size": 16})
-    plt.title(f'NIRS-CNN: Confusion Matrix for Arousal\nHidden Size: {hidden_size}, Holdout method: {subject_holdout_str} , Window size: {look_back}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {np.mean(arousal_accuracies):.2f}%, std: {np.std(arousal_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
+    plt.title(f'NIRS-CNN: Confusion Matrix for Arousal\nHidden Size: {hidden_size}, Sliding window overlap: {window_overlap_str}, Holdout method: {subject_holdout_str} , Window size: {look_back}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {np.mean(arousal_accuracies):.2f}%, std: {np.std(arousal_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
     plt.xlabel('Predicted')
     plt.ylabel('True')
     confusion_matrix_arousal_file_path = save_plot_with_timestamp(plt, 'confusion_matrix_arousal', output_folder)
@@ -191,7 +197,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     # Plotting confusion matrix for valence
     plt.figure(figsize=(20, 14))
     sns.heatmap(valence_cm, annot=True, fmt='d', xticklabels=class_names, yticklabels=class_names, cmap='Blues', annot_kws={"size": 16})
-    plt.title(f'NIRS-CNN: Confusion Matrix for Valence\nHidden Size: {hidden_size}, Holdout method: {subject_holdout_str}, Window size: {look_back}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {np.mean(arousal_accuracies):.2f}%, std: {np.std(valence_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
+    plt.title(f'NIRS-CNN: Confusion Matrix for Valence\nHidden Size: {hidden_size}, Sliding window overlap: {window_overlap_str}, Holdout method: {subject_holdout_str}, Window size: {look_back}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {np.mean(arousal_accuracies):.2f}%, std: {np.std(valence_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
     plt.xlabel('Predicted')
     plt.ylabel('True')
     confusion_matrix_valence_file_path = save_plot_with_timestamp(plt, 'confusion_matrix_valence', output_folder)
@@ -233,6 +239,10 @@ if __name__ == "__main__":
         "--window_size", type=int, default=10, help="Use subject holdout for CV"
     )
 
+    parser.add_argument(
+        "--window_overlap", type=bool, default=False, help="Use subject holdout for CV"
+    )
+
     args = parser.parse_args()
     path = args.p
     hidden_size = args.hidden_size
@@ -241,5 +251,6 @@ if __name__ == "__main__":
     learning_rate = args.learning_rate
     subject_holdout = args.subject_holdout
     window_size = args.window_size
+    window_overlap = args.window_overlap
 
-    sys.exit(classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size))
+    sys.exit(classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, window_overlap))
