@@ -240,7 +240,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--window_overlap", type=bool, default=False, help="Use subject holdout for CV"
+        "--window_overlap", type=bool, default=False, help="Sliding window overlap"
     )
 
     args = parser.parse_args()
