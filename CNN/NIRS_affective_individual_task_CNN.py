@@ -41,7 +41,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
         # Write headers to the csv
         # Headers for the csv
         headers = [
-            "Datetime", "modality", "CV_method", "hidden_size", "num_epochs", 
+            "Datetime", "modality", "CV_method", "window_overlap","hidden_size", "num_epochs", 
             "batch_size", "learning_rate", "valence_accuracy", "valence_std_dev", 
             "arousal_accuracy", "arousal_std_dev", "total_loss", "cm_path_arousal", "cm_path_valence"
         ]
@@ -206,7 +206,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     with open(csv_file_path, 'a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([
-            time.strftime("%Y-%m-%d %H:%M:%S"), "NIRS", subject_holdout_str, hidden_size, num_epochs, 
+            time.strftime("%Y-%m-%d %H:%M:%S"), "NIRS", subject_holdout_str, window_overlap_str, hidden_size, num_epochs, 
             batch_size, learning_rate, np.mean(valence_accuracies), np.std(valence_accuracies), 
             np.mean(arousal_accuracies), np.std(arousal_accuracies), np.mean(fold_losses), confusion_matrix_arousal_file_path, confusion_matrix_valence_file_path
         ])
