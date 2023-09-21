@@ -105,26 +105,34 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
         def __init__(self, input_shape, num_classes):
             super(CNN, self).__init__()
 
+            # Dynamically compute temporal kernel size as half of the time points
+            temporal_kernel_size = input_shape[1] // 2
+
             # First convolutional layer
-            self.conv1 = nn.Conv2d(1, 16, kernel_size=(1, 250), padding=(0, 25), bias=False)
+            self.conv1 = nn.Conv2d(1, 16, kernel_size=(1, temporal_kernel_size), padding=(0, temporal_kernel_size // 2), bias=False)
             self.bn1 = nn.BatchNorm2d(16)
             
             # Depthwise Convolution
-            self.conv2_depthwise = nn.Conv2d(16, 32, kernel_size=(35, 1), groups=16, bias=False)
+            self.conv2_depthwise = nn.Conv2d(16, 32, kernel_size=(input_shape[2], 1), groups=16, bias=False)
             self.bn2 = nn.BatchNorm2d(32)
             self.act2 = nn.ELU()
             self.avg_pool2 = nn.AvgPool2d(kernel_size=(1, 4), stride=(1, 4))
             self.drop2 = nn.Dropout(0.5)
             
-            # Separable Convolution
+            # Separable Convolution (kernel size hard-coded as an example)
             self.conv3_separable = nn.Conv2d(32, 32, kernel_size=(1, 15), padding=(0, 7), bias=False)
             self.bn3 = nn.BatchNorm2d(32)
             self.act3 = nn.ELU()
             self.avg_pool3 = nn.AvgPool2d(kernel_size=(1, 8), stride=(1, 8))
             self.drop3 = nn.Dropout(0.5)
 
+            # Dynamically compute the flattened size
+            dummy_input = torch.zeros(1, 1, input_shape[1], input_shape[2])
+            x = self.drop3(self.avg_pool3(self.act3(self.bn3(self.conv3_separable(self.drop2(self.avg_pool2(self.act2(self.bn2(self.conv2_depthwise(self.bn1(self.conv1(dummy_input))))))))))))
+            self.flattened_size = x.view(-1).size(0)
+
             # Fully connected layer before splitting into arousal and valence
-            self.fc1 = nn.Linear(32 * (500 // (4 * 8)), 128)
+            self.fc1 = nn.Linear(self.flattened_size, 128)
             self.act_fc1 = nn.ELU()
 
             # Fully connected layers for arousal and valence
