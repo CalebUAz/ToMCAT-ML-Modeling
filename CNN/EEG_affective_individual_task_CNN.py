@@ -103,6 +103,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
     # Define model
     class CNN(nn.Module):
         def __init__(self, input_shape, num_classes):
+            print('Input shape:',input_shape)
             super(CNN, self).__init__()
 
             # Dynamically compute temporal kernel size as half of the time points
