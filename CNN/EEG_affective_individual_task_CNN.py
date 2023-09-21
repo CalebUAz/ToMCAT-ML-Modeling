@@ -106,7 +106,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             super(CNN, self).__init__()
 
             # First convolutional layer
-            self.conv1 = nn.Conv2d(1, 16, kernel_size=(1, 51), padding=(0, 25), bias=False)
+            self.conv1 = nn.Conv2d(1, 16, kernel_size=(1, 250), padding=(0, 25), bias=False)
             self.bn1 = nn.BatchNorm2d(16)
             
             # Depthwise Convolution
