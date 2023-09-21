@@ -106,14 +106,14 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             super(CNN, self).__init__()
 
             # Dynamically compute temporal kernel size as half of the time points
-            temporal_kernel_size = input_shape[1] // 2
+            temporal_kernel_size = input_shape[0] // 2
 
             # First convolutional layer
             self.conv1 = nn.Conv2d(1, 16, kernel_size=(1, temporal_kernel_size), padding=(0, temporal_kernel_size // 2), bias=False)
             self.bn1 = nn.BatchNorm2d(16)
             
             # Depthwise Convolution
-            self.conv2_depthwise = nn.Conv2d(16, 32, kernel_size=(input_shape[2], 1), groups=16, bias=False)
+            self.conv2_depthwise = nn.Conv2d(16, 32, kernel_size=(input_shape[0], 1), groups=16, bias=False)
             self.bn2 = nn.BatchNorm2d(32)
             self.act2 = nn.ELU()
             self.avg_pool2 = nn.AvgPool2d(kernel_size=(1, 4), stride=(1, 4))
@@ -127,7 +127,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             self.drop3 = nn.Dropout(0.5)
 
             # Dynamically compute the flattened size
-            dummy_input = torch.zeros(1, 1, input_shape[1], input_shape[2])
+            dummy_input = torch.zeros(1, 1, input_shape[0], input_shape[1])
             x = self.drop3(self.avg_pool3(self.act3(self.bn3(self.conv3_separable(self.drop2(self.avg_pool2(self.act2(self.bn2(self.conv2_depthwise(self.bn1(self.conv1(dummy_input))))))))))))
             self.flattened_size = x.view(-1).size(0)
 
