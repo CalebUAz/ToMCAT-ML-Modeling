@@ -106,25 +106,22 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             print('Input shape:',input_shape)
             super(CNN, self).__init__()
 
-            # Dynamically compute temporal kernel size as half of the time points
-            temporal_kernel_size = input_shape[0] // 2
-
-            # First convolutional layer
-            self.conv1 = nn.Conv2d(1, 16, kernel_size=(1, temporal_kernel_size), padding=(0, temporal_kernel_size // 2), bias=False)
+            # Temporal convolution
+            self.conv1 = nn.Conv2d(1, 16, kernel_size=(1, 125), padding=(0, 62), bias=False)
             self.bn1 = nn.BatchNorm2d(16)
             
             # Depthwise Convolution
-            self.conv2_depthwise = nn.Conv2d(16, 32, kernel_size=(input_shape[0], 1), groups=16, bias=False)
+            self.conv2_depthwise = nn.Conv2d(16, 32, kernel_size=(28, 1), groups=16, bias=False)
             self.bn2 = nn.BatchNorm2d(32)
             self.act2 = nn.ELU()
             self.avg_pool2 = nn.AvgPool2d(kernel_size=(1, 4), stride=(1, 4))
             self.drop2 = nn.Dropout(0.5)
             
-            # Separable Convolution (kernel size hard-coded as an example)
-            self.conv3_separable = nn.Conv2d(32, 32, kernel_size=(1, 15), padding=(0, 7), bias=False)
+            # Separable Convolution 
+            self.conv3_separable = nn.Conv2d(32, 32, kernel_size=(1, 16), padding=(0, 8), bias=False)
             self.bn3 = nn.BatchNorm2d(32)
             self.act3 = nn.ELU()
-            self.avg_pool3 = nn.AvgPool2d(kernel_size=(1, 8), stride=(1, 8))
+            self.avg_pool3 = nn.AvgPool2d(kernel_size=(1, 4), stride=(1, 4))
             self.drop3 = nn.Dropout(0.5)
 
             # Dynamically compute the flattened size
