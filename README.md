@@ -1,9 +1,9 @@
 # ToMCAT-ML-Modeling
 
-This repository contains scripts that uses a LSTM model to classify valence and arousal from EEG and fNIRS labeled datasets. 
+This repository contains scripts that use a separate CNN and LSTM model to classify valence and arousal from EEG and fNIRS labeled datasets. 
 
 ## Package Installation
-This project requires specific Python packages to be installed. Please follow the instructions below to set up the environment and install the required packages.
+This project requires specific Python packages to be installed. Please follow the instructions below to set up the environment and install the packages you need.
 ### Environment Setup
 1. Make sure you have Python 3.11.3 installed on your system. You can download Python from the official Python website: https://www.python.org/downloads/
 2. Create a new virtual environment for this project (optional but recommended). Open a terminal or command prompt and execute the following command:
