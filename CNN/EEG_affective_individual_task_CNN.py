@@ -22,7 +22,11 @@ import seaborn as sns
 from sklearn.model_selection import GroupShuffleSplit
 from utils import save_plot_with_timestamp, sliding_window, load_dataset_EEG, sliding_window_no_overlap, train_test_split, train_test_split, train_test_split_subject_holdout, sliding_window_get_sub_id, is_file_empty_or_nonexistent, sliding_window_no_subject_overlap
 
-def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size):
+def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, gpu):
+
+    if gpu != "cuda:1":
+        # Set the device to be used for training
+        gpu = "cuda:0"
 
     # Create the output folder if it doesn't exist
     output_folder = 'output'
@@ -62,7 +66,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
         merged_df = merged_df.drop(['subject_id'], axis=1)
 
     # Check if CUDA is available
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device(gpu if torch.cuda.is_available() else "cpu")
 
     # Preprocess data
     features = merged_df.iloc[:, :pos[0]].values
@@ -74,8 +78,8 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
     # Get images from sliding window
     look_back = window_size
     # features, valence, arousal = sliding_window(features, valence_score, arousal_score, look_back=look_back)
-    features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'eeg',look_back=look_back)
-    # features, valence, arousal =  sliding_window_no_subject_overlap(features, valence_score, arousal_score, subject_ids,'eeg',look_back=look_back)
+    # features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'eeg',look_back=look_back)
+    features, valence, arousal =  sliding_window_no_subject_overlap(features, valence_score, arousal_score, subject_ids,'eeg',look_back=look_back)
     targets = list(zip(valence, arousal))
 
     # Hyperparameters
@@ -231,8 +235,15 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--window_size", type=int, default=500, help="Use subject holdout for CV"
+        "--window_size", type=int, default=500, help="Adjust window size for sliding window"
     )
+
+    parser.add_argument(
+        '--gpu',
+        default="cuda:1",
+        required=False, 
+        type=str,
+        help="cuda:0 or cuda:1")
 
     args = parser.parse_args()
     path = args.p
@@ -242,5 +253,6 @@ if __name__ == "__main__":
     learning_rate = args.learning_rate
     subject_holdout = args.subject_holdout
     window_size = args.window_size
+    gpu = args.gpu
 
-    sys.exit(classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size))
+    sys.exit(classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, gpu))
