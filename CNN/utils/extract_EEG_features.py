@@ -35,6 +35,11 @@ def get_eeg_frequency_band_data(signals):
             coeffs = pywt.wavedec(channel_data, wavelet, level=level)
             # Reconstruct the signal from the coefficients (or use the coefficients as features)
             reconstructed_signal = pywt.waverec(coeffs, wavelet)
+            
+            # Trim or pad the reconstructed_signal to match the original channel_data size
+            if len(reconstructed_signal) != len(channel_data):
+                reconstructed_signal = reconstructed_signal[:len(channel_data)]
+                
             band_wavelet_data.append(reconstructed_signal)
             
         all_wavelet_data.append(np.array(band_wavelet_data))
