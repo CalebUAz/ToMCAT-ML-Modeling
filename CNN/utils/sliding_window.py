@@ -57,7 +57,7 @@ def sliding_window_get_sub_id(subject_id, **options):
 
     return np.array(dataX)
 
-def sliding_window_no_subject_overlap(signals, valence, arousal, subject_id, modality, **options, use_wavelet):
+def sliding_window_no_subject_overlap(signals, valence, arousal, subject_id, modality, use_wavelet, **options):
     #No overlap between windows and No overlap between subjects. 
     """Convert an array of X, Y values into a dataset matrix for a CNN"""
 
