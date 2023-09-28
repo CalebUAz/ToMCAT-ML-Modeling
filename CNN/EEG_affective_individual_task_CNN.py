@@ -109,7 +109,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
             super(CNN, self).__init__()
 
             # Temporal convolution
-            self.conv1 = nn.Conv2d(1, 16, kernel_size=(1, int(input_shape[0])), padding=(0, 62), bias=False)
+            self.conv1 = nn.Conv2d(1, 16, kernel_size=(1, 500), padding=(0, 62), bias=False)
             self.bn1 = nn.BatchNorm2d(16)
             
             # Depthwise Convolution
