@@ -22,6 +22,9 @@ import seaborn as sns
 from sklearn.model_selection import GroupShuffleSplit
 from utils import save_plot_with_timestamp, sliding_window, load_dataset_EEG, sliding_window_no_overlap, train_test_split, train_test_split, train_test_split_subject_holdout, sliding_window_get_sub_id, is_file_empty_or_nonexistent, sliding_window_no_subject_overlap
 
+
+os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb=256'
+
 def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, gpu, use_wavelet):
 
     if gpu != "cuda:1":
