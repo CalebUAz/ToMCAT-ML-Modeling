@@ -140,8 +140,8 @@ def train_test_split_subject_holdout(group_split,groups, targets, dataset, num_f
         # Split data into train and test sets for the current fold
         train_data = Subset(dataset, train_indices)
         test_data = Subset(dataset, test_indices)
-        train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
-        test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
+        train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True, pin_memory=True)
+        test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False, pin_memory=True)
 
         # Training
         model.train()
