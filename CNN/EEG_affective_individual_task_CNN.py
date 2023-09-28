@@ -20,7 +20,7 @@ from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import GroupShuffleSplit
-from utils import save_plot_with_timestamp, sliding_window, load_dataset_EEG, sliding_window_no_overlap, train_test_split, train_test_split, train_test_split_subject_holdout, sliding_window_get_sub_id, is_file_empty_or_nonexistent
+from utils import save_plot_with_timestamp, sliding_window, load_dataset_EEG, sliding_window_no_overlap, train_test_split, train_test_split, train_test_split_subject_holdout, sliding_window_get_sub_id, is_file_empty_or_nonexistent, sliding_window_no_subject_overlap
 
 def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size):
 
@@ -73,7 +73,8 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
     # Get images from sliding window
     look_back = window_size
     # features, valence, arousal = sliding_window(features, valence_score, arousal_score, look_back=look_back)
-    features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'eeg',look_back=look_back)
+    # features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'eeg',look_back=look_back)
+    features, valence, arousal =  sliding_window_no_subject_overlap(features, valence_score, arousal_score, merged_df['subject_id'],'eeg',look_back=look_back)
     targets = list(zip(valence, arousal))
 
     # Hyperparameters
