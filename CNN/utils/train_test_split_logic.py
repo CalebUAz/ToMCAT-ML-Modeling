@@ -28,8 +28,8 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
             progress_bar = tqdm(train_loader, desc=f"Fold {fold+1} Epoch {epoch+1}/{num_epochs}")
             for i, (inputs, targets) in enumerate(progress_bar):
                 inputs = inputs.view(-1, 1, *input_size)
-                targets_arousal = targets[:, 0]
-                targets_valence = targets[:, 1]
+                targets_arousal = targets[:, 0].cpu()
+                targets_valence = targets[:, 1].cpu()
 
                 arousal_outputs, valence_outputs = model(inputs)
                 loss_arousal = criterion(arousal_outputs, targets_arousal)
@@ -43,6 +43,10 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
+
+                # Clear cache and delete unnecessary variables
+                torch.cuda.empty_cache()
+                del inputs, targets
 
                 progress_bar.set_postfix(loss=loss.item())
 
