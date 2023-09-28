@@ -58,6 +58,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
         print("Using subject holdout for CV")
     else:
         pos = [-2,-1]
+        subject_ids = merged_df['subject_id']
         merged_df = merged_df.drop(['subject_id'], axis=1)
 
     # Check if CUDA is available
@@ -74,7 +75,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
     look_back = window_size
     # features, valence, arousal = sliding_window(features, valence_score, arousal_score, look_back=look_back)
     # features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'eeg',look_back=look_back)
-    features, valence, arousal =  sliding_window_no_subject_overlap(features, valence_score, arousal_score, merged_df['subject_id'],'eeg',look_back=look_back)
+    features, valence, arousal =  sliding_window_no_subject_overlap(features, valence_score, arousal_score, subject_ids,'eeg',look_back=look_back)
     targets = list(zip(valence, arousal))
 
     # Hyperparameters
