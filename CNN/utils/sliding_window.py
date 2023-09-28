@@ -57,7 +57,7 @@ def sliding_window_get_sub_id(subject_id, **options):
 
     return np.array(dataX)
 
-def sliding_window_no_subject_overlap(signals, valence, arousal, subject_id, modality, **options):
+def sliding_window_no_subject_overlap(signals, valence, arousal, subject_id, modality, **options, use_wavelet):
     #No overlap between windows and No overlap between subjects. 
     """Convert an array of X, Y values into a dataset matrix for a CNN"""
 
@@ -66,7 +66,7 @@ def sliding_window_no_subject_overlap(signals, valence, arousal, subject_id, mod
     
     if modality == 'eeg':
         # Convert EEG signals to frequency bands
-        signals = get_eeg_frequency_band_data(signals)
+        signals = get_eeg_frequency_band_data(signals, use_wavelet)
 
     unique_subjects = np.unique(subject_id)
     

@@ -22,7 +22,7 @@ import seaborn as sns
 from sklearn.model_selection import GroupShuffleSplit
 from utils import save_plot_with_timestamp, sliding_window, load_dataset_EEG, sliding_window_no_overlap, train_test_split, train_test_split, train_test_split_subject_holdout, sliding_window_get_sub_id, is_file_empty_or_nonexistent, sliding_window_no_subject_overlap
 
-def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, gpu):
+def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, gpu, use_wavelet):
 
     if gpu != "cuda:1":
         # Set the device to be used for training
@@ -80,7 +80,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
     # features, valence, arousal = sliding_window(features, valence_score, arousal_score, look_back=look_back)
     # features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'eeg',look_back=look_back)
     features, valence, arousal =  sliding_window_no_subject_overlap(features, valence_score, arousal_score, subject_ids,'eeg',look_back=look_back)
-    targets = list(zip(valence, arousal))
+    targets = list(zip(valence, arousal), use_wavelet)
 
     # Hyperparameters
     input_size = features.shape[1:]
@@ -244,6 +244,11 @@ if __name__ == "__main__":
         required=False, 
         type=str,
         help="cuda:0 or cuda:1")
+    
+    parser.add_argument(
+        "--use_wavelet", type=bool, default=False, help="Use wavelet decomposition"
+    )
+    
 
     args = parser.parse_args()
     path = args.p
@@ -254,5 +259,6 @@ if __name__ == "__main__":
     subject_holdout = args.subject_holdout
     window_size = args.window_size
     gpu = args.gpu
+    use_wavelet = args.use_wavelet
 
-    sys.exit(classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, gpu))
+    sys.exit(classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, gpu, use_wavelet))

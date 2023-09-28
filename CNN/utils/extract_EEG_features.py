@@ -2,7 +2,7 @@ import numpy as np
 import mne
 import pywt
 
-def get_eeg_frequency_band_data(signals):
+def get_eeg_frequency_band_data(signals, use_wavelet):
     # Frequency bands definitions
     bands = {
         'Theta': (4, 8),
@@ -30,24 +30,31 @@ def get_eeg_frequency_band_data(signals):
         filtered_data = raw.copy().filter(fmin, fmax).get_data()
         all_band_data.append(filtered_data)
         
-        band_wavelet_data = []
-        for channel_data in filtered_data:
-            coeffs = pywt.wavedec(channel_data, wavelet, level=level)
-            # Reconstruct the signal from the coefficients (or use the coefficients as features)
-            reconstructed_signal = pywt.waverec(coeffs, wavelet)
-            
-            # Trim or pad the reconstructed_signal to match the original channel_data size
-            if len(reconstructed_signal) != len(channel_data):
-                reconstructed_signal = reconstructed_signal[:len(channel_data)]
+        if use_wavelet:
+            band_wavelet_data = []
+            for channel_data in filtered_data:
+                coeffs = pywt.wavedec(channel_data, wavelet, level=level)
+                # Reconstruct the signal from the coefficients (or use the coefficients as features)
+                reconstructed_signal = pywt.waverec(coeffs, wavelet)
                 
-            band_wavelet_data.append(reconstructed_signal)
-            
-        all_wavelet_data.append(np.array(band_wavelet_data))
+                # Trim or pad the reconstructed_signal to match the original channel_data size
+                if len(reconstructed_signal) != len(channel_data):
+                    reconstructed_signal = reconstructed_signal[:len(channel_data)]
+                    
+                band_wavelet_data.append(reconstructed_signal)
+                
+            all_wavelet_data.append(np.array(band_wavelet_data))
 
     stacked_band_data = np.concatenate(all_band_data, axis=0)
-    stacked_wavelet_data = np.concatenate(all_wavelet_data, axis=0)
     
-    # Combine the filtered band data with the wavelet data
-    combined_data = np.concatenate((stacked_band_data, stacked_wavelet_data), axis=0)
-    
-    return combined_data.T
+    # If use_wavelet is True, concatenate the wavelet data
+    if use_wavelet:
+        stacked_wavelet_data = np.concatenate(all_wavelet_data, axis=0)
+        
+        # Combine the filtered band data with the wavelet data
+        combined_data = np.concatenate((stacked_band_data, stacked_wavelet_data), axis=0)
+        return combined_data.T
+    else:
+        # If not using wavelet, just return the frequency band data
+        return stacked_band_data.T
+
