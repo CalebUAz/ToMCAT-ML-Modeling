@@ -46,7 +46,8 @@ def get_eeg_frequency_band_data(signals, use_wavelet, use_emd):
             for channel_data in filtered_data:
                 emd = EMD()
                 imfs = emd(channel_data)
-                band_imf_data.append(imfs)
+                first_four_imfs = imfs[:4, :] if imfs.shape[0] >= 4 else np.vstack((imfs, np.zeros((4 - imfs.shape[0], imfs.shape[1]))))
+                band_imf_data.append(first_four_imfs)
             all_imf_data.append(np.array(band_imf_data))
 
     stacked_band_data = np.concatenate(all_band_data, axis=0)
@@ -60,4 +61,3 @@ def get_eeg_frequency_band_data(signals, use_wavelet, use_emd):
         combined_data = np.concatenate((combined_data, stacked_imf_data), axis=0)
         
     return combined_data.T
-
