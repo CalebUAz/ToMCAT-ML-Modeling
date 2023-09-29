@@ -81,8 +81,8 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
     # Get images from sliding window
     look_back = window_size
     # features, valence, arousal = sliding_window(features, valence_score, arousal_score, look_back=look_back)
-    features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'eeg', use_wavelet,look_back=look_back)
-    # features, valence, arousal =  sliding_window_no_subject_overlap(features, valence_score, arousal_score, subject_ids,'eeg', use_wavelet,look_back=look_back)
+    # features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'eeg', use_wavelet,look_back=look_back)
+    features, valence, arousal =  sliding_window_no_subject_overlap(features, valence_score, arousal_score, subject_ids,'eeg', use_wavelet,look_back=look_back)
     targets = list(zip(valence, arousal))
 
     # Hyperparameters
