@@ -1,8 +1,9 @@
 import numpy as np
 import mne
 import pywt
+from PyEMD import EMD
 
-def get_eeg_frequency_band_data(signals, use_wavelet):
+def get_eeg_frequency_band_data(signals, use_wavelet, use_emd):
     # Frequency bands definitions
     bands = {
         'Theta': (4, 8),
@@ -21,8 +22,8 @@ def get_eeg_frequency_band_data(signals, use_wavelet):
 
     all_band_data = []
     all_wavelet_data = []
+    all_imf_data = []
     
-    # For wavelet decomposition, you might choose an appropriate wavelet and level of decomposition
     wavelet = 'db4'  # Daubechies 4 wavelet
     level = 4  # Level of decomposition
 
@@ -34,27 +35,29 @@ def get_eeg_frequency_band_data(signals, use_wavelet):
             band_wavelet_data = []
             for channel_data in filtered_data:
                 coeffs = pywt.wavedec(channel_data, wavelet, level=level)
-                # Reconstruct the signal from the coefficients (or use the coefficients as features)
                 reconstructed_signal = pywt.waverec(coeffs, wavelet)
-                
-                # Trim or pad the reconstructed_signal to match the original channel_data size
                 if len(reconstructed_signal) != len(channel_data):
                     reconstructed_signal = reconstructed_signal[:len(channel_data)]
-                    
                 band_wavelet_data.append(reconstructed_signal)
-                
             all_wavelet_data.append(np.array(band_wavelet_data))
+
+        if use_emd:
+            band_imf_data = []
+            for channel_data in filtered_data:
+                emd = EMD()
+                imfs = emd(channel_data)
+                band_imf_data.append(imfs)
+            all_imf_data.append(np.array(band_imf_data))
 
     stacked_band_data = np.concatenate(all_band_data, axis=0)
     
-    # If use_wavelet is True, concatenate the wavelet data
+    combined_data = stacked_band_data
     if use_wavelet:
         stacked_wavelet_data = np.concatenate(all_wavelet_data, axis=0)
+        combined_data = np.concatenate((combined_data, stacked_wavelet_data), axis=0)
+    if use_emd:
+        stacked_imf_data = np.concatenate(all_imf_data, axis=0)
+        combined_data = np.concatenate((combined_data, stacked_imf_data), axis=0)
         
-        # Combine the filtered band data with the wavelet data
-        combined_data = np.concatenate((stacked_band_data, stacked_wavelet_data), axis=0)
-        return combined_data.T
-    else:
-        # If not using wavelet, just return the frequency band data
-        return stacked_band_data.T
+    return combined_data.T
 
