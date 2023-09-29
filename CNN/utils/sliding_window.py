@@ -19,7 +19,7 @@ def sliding_window(signals, valence, arousal, **options):
 
     return np.array(dataX), np.array(dataValenceScore), np.array(dataArousalScore)
 
-def sliding_window_no_overlap(signals, valence, arousal, modality, use_wavelet, **options):
+def sliding_window_no_overlap(signals, valence, arousal, modality, use_wavelet, use_emd, **options):
     """Convert an array of X, Y values into a dataset matrix for a CNN"""
 
     look_back = options.pop('look_back', None)
@@ -27,7 +27,7 @@ def sliding_window_no_overlap(signals, valence, arousal, modality, use_wavelet, 
 
     if modality == 'eeg':
         # Convert EEG signals to frequency bands
-        signals = get_eeg_frequency_band_data(signals, use_wavelet)
+        signals = get_eeg_frequency_band_data(signals, use_wavelet, use_emd)
 
     for i in range(0, len(signals) - look_back, look_back):  # Skip by 'look_back' for non-overlapping window
         a = signals[i:(i+look_back)]
@@ -57,7 +57,7 @@ def sliding_window_get_sub_id(subject_id, **options):
 
     return np.array(dataX)
 
-def sliding_window_no_subject_overlap(signals, valence, arousal, subject_id, modality, use_wavelet, **options):
+def sliding_window_no_subject_overlap(signals, valence, arousal, subject_id, modality, use_wavelet, use_emd, **options):
     #No overlap between windows and No overlap between subjects. 
     """Convert an array of X, Y values into a dataset matrix for a CNN"""
 
@@ -66,7 +66,7 @@ def sliding_window_no_subject_overlap(signals, valence, arousal, subject_id, mod
     
     if modality == 'eeg':
         # Convert EEG signals to frequency bands
-        signals = get_eeg_frequency_band_data(signals, use_wavelet)
+        signals = get_eeg_frequency_band_data(signals, use_wavelet, use_emd)
 
     unique_subjects = np.unique(subject_id)
     

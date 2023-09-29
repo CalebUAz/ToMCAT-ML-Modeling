@@ -25,7 +25,7 @@ from utils import save_plot_with_timestamp, sliding_window, load_dataset_EEG, sl
 
 # os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:27702"
 
-def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, gpu, use_wavelet):
+def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, gpu, use_wavelet, use_emd):
 
     if gpu != "cuda:1":
         # Set the device to be used for training
@@ -81,8 +81,8 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
     # Get images from sliding window
     look_back = window_size
     # features, valence, arousal = sliding_window(features, valence_score, arousal_score, look_back=look_back)
-    # features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'eeg', use_wavelet,look_back=look_back)
-    features, valence, arousal =  sliding_window_no_subject_overlap(features, valence_score, arousal_score, subject_ids,'eeg', use_wavelet,look_back=look_back)
+    # features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'eeg', use_wavelet, use_emd, look_back=look_back)
+    features, valence, arousal =  sliding_window_no_subject_overlap(features, valence_score, arousal_score, subject_ids,'eeg', use_wavelet, use_emd, look_back=look_back)
     targets = list(zip(valence, arousal))
 
     # Hyperparameters
@@ -251,6 +251,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--use_wavelet", type=bool, default=False, help="Use wavelet decomposition"
     )
+
+    parser.add_argument(
+        "--use_emd", type=bool, default=False, help="Use EMD decomposition"
+    )
     
 
     args = parser.parse_args()
@@ -263,5 +267,6 @@ if __name__ == "__main__":
     window_size = args.window_size
     gpu = args.gpu
     use_wavelet = args.use_wavelet
+    use_emd = args.use_emd
 
-    sys.exit(classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, gpu, use_wavelet))
+    sys.exit(classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, gpu, use_wavelet, use_emd))
