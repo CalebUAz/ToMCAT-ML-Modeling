@@ -20,10 +20,12 @@ from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import GroupShuffleSplit
-from utils import save_plot_with_timestamp, sliding_window, load_dataset_NIRS, sliding_window_no_overlap, train_test_split, train_test_split, train_test_split_subject_holdout, sliding_window_get_sub_id, is_file_empty_or_nonexistent
+from utils import save_plot_with_timestamp, sliding_window, load_dataset_NIRS, sliding_window_no_overlap, train_test_split, train_test_split, train_test_split_subject_holdout, sliding_window_get_sub_id, is_file_empty_or_nonexistent, sliding_window_no_subject_overlap
 
 def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, window_overlap):
 
+    use_wavelet, use_emd = False, False
+    
     # Create the output folder if it doesn't exist
     output_folder = 'output'
     if not os.path.exists(output_folder):
@@ -58,6 +60,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
         print("Using subject holdout for CV")
     else:
         pos = [-2,-1]
+        subject_ids = merged_df['subject_id']
         merged_df = merged_df.drop(['subject_id'], axis=1)
 
     # Check if CUDA is available
@@ -76,8 +79,9 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
         features, valence, arousal = sliding_window(features, valence_score, arousal_score, look_back=look_back)
         window_overlap_str = True
     else:
-        features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'nirs', look_back=look_back)
+        # features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'nirs', look_back=look_back)
         window_overlap_str = False
+        features, valence, arousal =  sliding_window_no_subject_overlap(features, valence_score, arousal_score, subject_ids,'nirs', use_wavelet, use_emd, look_back=look_back)
 
     targets = list(zip(valence, arousal))
 
