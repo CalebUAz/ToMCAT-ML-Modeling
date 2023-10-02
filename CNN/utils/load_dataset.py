@@ -21,7 +21,7 @@ def load_dataset_NIRS(path):
         "S1-D1_HbR", "S1-D2_HbR", "S2-D1_HbR", "S2-D3_HbR", "S3-D1_HbR",
         "S3-D3_HbR", "S3-D4_HbR", "S4-D2_HbR", "S4-D4_HbR", "S4-D5_HbR",
         "S5-D3_HbR", "S5-D4_HbR", "S5-D6_HbR", "S6-D4_HbR", "S6-D6_HbR",
-        "S6-D7_HbR", "S7-D5_HbR", "S7-D7_HbR", "S8-D6_HbR", "S8-D7_HbR",
+        "S6-D7_HbR", "S7-D5_HbR", "S7-D7_HbR", "S8-D6_HbR", "S8-D7_HbR", "image_path",
         "arousal_score", "valence_score"
     ]
 
@@ -30,7 +30,7 @@ def load_dataset_NIRS(path):
                        "S1-D1_HbO", "S1-D1_HbR", "S1-D2_HbO", "S1-D2_HbR", 
                        "S4-D4_HbO", "S4-D4_HbR", "S3-D4_HbO", "S3-D4_HbR", 
                        "S3-D1_HbO", "S3-D1_HbR", "S6-D7_HbO", "S6-D7_HbR", 
-                       "S6-D4_HbO", "S6-D4_HbR", "arousal_score", "valence_score"]
+                       "S6-D4_HbO", "S6-D4_HbR", "image_path", "arousal_score", "valence_score"]
     count = 0
     for root, dirs, files in os.walk(directory):
         for folder in dirs:
@@ -69,7 +69,7 @@ def load_dataset_NIRS(path):
                             'valence_score', 'event_type']] = df[['image_path', 'arousal_score', 
                                                                         'valence_score', 'event_type']].fillna(method='bfill')
                         
-                        df.drop(columns=['image_path', 'event_type'], inplace=True)
+                        df.drop(columns=['event_type'], inplace=True)
                         df.dropna(inplace=True)
                         #print(df.columns)
                         df.columns = [None] * len(df.columns)
@@ -82,13 +82,28 @@ def load_dataset_NIRS(path):
     print("-------------------------")
     print("Number of subjects: {}".format(count))
     print("-------------------------")
+    dfs = [df.reset_index() for df in dfs]
     combined_df = pd.concat(dfs, ignore_index=True)
+    combined_df = combined_df.drop(columns = ['index'])
     combined_df = combined_df.set_axis(headers, axis=1)
     combined_df = combined_df[columns_to_keep]
 
     # Subject id for train test split logic
     combined_df['subject_id'] = np.concatenate([[subject] * len(df) for subject, df in zip(subject_ids, dfs)])
 
+    get_specific_region = True
+    if get_specific_region:
+        #Get first x samples after the subject sees the image
+        print("-------------------------")
+        print("Getting specific window region from data")
+        print("-------------------------")
+        combined_df_temp = combined_df
+        combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
+        modified_df = combined_df_temp[combined_df_temp['cumcount'] < 20].drop(columns='cumcount')
+        combined_df = modified_df.drop(columns=['image_path'])
+    else:
+        combined_df = combined_df.drop(columns=['image_path'])
+        
     return combined_df
 
 def load_dataset_EEG(path):
@@ -103,12 +118,12 @@ def load_dataset_EEG(path):
     dfs = [] # List of dataframes
     subject_ids = [] # Subject id for train test split logic
     headers = [
-    "AFF1h", "F7", "FC5", "C3", "T7", "TP9", "Pz", "P3", "P7", "O1", "O2", "P8", "P4", "TP10", "Cz", "C4", "T8", "FC6", "FCz", "F8", "AFF2h", "GSR", "EKG", "arousal_score", "valence_score"]
+    "AFF1h", "F7", "FC5", "C3", "T7", "TP9", "Pz", "P3", "P7", "O1", "O2", "P8", "P4", "TP10", "Cz", "C4", "T8", "FC6", "FCz", "F8", "AFF2h", "GSR", "EKG", "image_path", "arousal_score", "valence_score"]
 
     drop_headers = ['AFF5h', 'FC1', 'CP5', 'CP1', 'PO9', 'Oz', 'PO10', 'CP6', 'CP2', 'FC2', 'AFF6h']
     
     columns_to_keep = ["FC5", "FCz", "FC6", "F7",
-                       "F8", "AFF1h", "AFF2h", "arousal_score", "valence_score"]
+                       "F8", "AFF1h", "AFF2h", "image_path", "arousal_score", "valence_score"]
     count = 0
     for root, dirs, files in os.walk(directory):
         for folder in dirs:
@@ -150,7 +165,7 @@ def load_dataset_EEG(path):
                             'valence_score', 'event_type']] = df[['image_path', 'arousal_score', 
                                                                         'valence_score', 'event_type']].fillna(method='bfill')
                         
-                        df.drop(columns=['image_path', 'event_type'], inplace=True)
+                        df.drop(columns=['event_type'], inplace=True)
                         df.dropna(inplace=True)
                         df.columns = [None] * len(df.columns)
                         
@@ -163,11 +178,26 @@ def load_dataset_EEG(path):
     print("-------------------------")
     print("Number of subjects: {}".format(count))
     print("-------------------------")
+    dfs = [df.reset_index() for df in dfs]
     combined_df = pd.concat(dfs, ignore_index=True)
+    combined_df = combined_df.drop(columns = ['index'])
     combined_df = combined_df.set_axis(headers, axis=1)
     combined_df = combined_df[columns_to_keep]
 
     # Subject id for train test split logic
     combined_df['subject_id'] = np.concatenate([[subject] * len(df) for subject, df in zip(subject_ids, dfs)])
+
+    get_specific_region = True
+    if get_specific_region:
+        #Get first x samples after the subject sees the image
+        print("-------------------------")
+        print("Getting specific window region from data")
+        print("-------------------------")
+        combined_df_temp = combined_df
+        combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
+        modified_df = combined_df_temp[combined_df_temp['cumcount'] < 3000].drop(columns='cumcount')
+        combined_df = modified_df.drop(columns=['image_path'])
+    else:
+        combined_df = combined_df.drop(columns=['image_path'])
 
     return combined_df
