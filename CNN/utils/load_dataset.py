@@ -91,7 +91,7 @@ def load_dataset_NIRS(path):
     # Subject id for train test split logic
     combined_df['subject_id'] = np.concatenate([[subject] * len(df) for subject, df in zip(subject_ids, dfs)])
 
-    get_specific_region = True
+    get_specific_region = False
     if get_specific_region:
         #Get first x samples after the subject sees the image
         print("-------------------------")
