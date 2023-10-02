@@ -99,7 +99,7 @@ def load_dataset_NIRS(path):
         print("-------------------------")
         combined_df_temp = combined_df
         combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
-        modified_df = combined_df_temp[combined_df_temp['cumcount'] < 20].drop(columns='cumcount')
+        modified_df = combined_df_temp[combined_df_temp['cumcount'] < 50].drop(columns='cumcount')
         combined_df = modified_df.drop(columns=['image_path'])
     else:
         combined_df = combined_df.drop(columns=['image_path'])
