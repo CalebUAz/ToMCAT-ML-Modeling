@@ -195,7 +195,7 @@ def load_dataset_EEG(path):
         print("-------------------------")
         combined_df_temp = combined_df
         combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
-        modified_df = combined_df_temp[combined_df_temp['cumcount'] < 3000].drop(columns='cumcount')
+        modified_df = combined_df_temp[combined_df_temp['cumcount'] < 2000].drop(columns='cumcount')
         combined_df = modified_df.drop(columns=['image_path'])
     else:
         combined_df = combined_df.drop(columns=['image_path'])
