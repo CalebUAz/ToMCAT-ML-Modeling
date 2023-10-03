@@ -25,7 +25,7 @@ from utils import save_plot_with_timestamp, sliding_window, load_dataset_NIRS, s
 def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, window_overlap):
 
     use_wavelet, use_emd = False, False
-    
+
     # Create the output folder if it doesn't exist
     output_folder = 'output'
     if not os.path.exists(output_folder):
@@ -112,46 +112,46 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
     # Define model
     class CNN(nn.Module):
         def __init__(self, input_shape, num_classes):
+            print('Input shape:',input_shape)
             super(CNN, self).__init__()
 
-            # Conv Layer 1
-            self.conv1 = nn.Conv2d(1, 32, kernel_size=(3, 3), stride=1, padding=1)
-            self.bn1 = nn.BatchNorm2d(32)
-            self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
-
-            # Conv Layer 2
-            self.conv2 = nn.Conv2d(32, 64, kernel_size=(5, 5), stride=1, padding=2)
-            self.bn2 = nn.BatchNorm2d(64)
-            self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
-
-            # Conv Layer 3
-            self.conv3 = nn.Conv2d(64, 128, kernel_size=(7, 7), stride=1, padding=3)
-            self.bn3 = nn.BatchNorm2d(128)
-            self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
+            # Temporal convolution
+            self.conv1 = nn.Conv2d(1, 16, kernel_size=(1, 125), padding=(0, 62), bias=False)
+            self.bn1 = nn.BatchNorm2d(16)
             
-            # Dummy forward pass to calculate the number of features
-            x = torch.zeros(1, 1, input_shape[0], input_shape[1])  # 1 is for batch size and channels
-            x = self.pool1(F.relu(self.bn1(self.conv1(x))))
-            x = self.pool2(F.relu(self.bn2(self.conv2(x))))
-            x = self.pool3(F.relu(self.bn3(self.conv3(x))))
+            # Depthwise Convolution
+            self.conv2_depthwise = nn.Conv2d(16, 32, kernel_size=(28, 1), groups=16, bias=False)
+            self.bn2 = nn.BatchNorm2d(32)
+            self.act2 = nn.ELU()
+            self.avg_pool2 = nn.AvgPool2d(kernel_size=(1, 4), stride=(1, 4))
+            self.drop2 = nn.Dropout(0.5)
+            
+            # Separable Convolution 
+            self.conv3_separable = nn.Conv2d(32, 32, kernel_size=(1, 16), padding=(0, 8), bias=False)
+            self.bn3 = nn.BatchNorm2d(32)
+            self.act3 = nn.ELU()
+            self.avg_pool3 = nn.AvgPool2d(kernel_size=(1, 4), stride=(1, 4))
+            self.drop3 = nn.Dropout(0.5)
+
+            # Dynamically compute the flattened size
+            dummy_input = torch.zeros(1, 1, input_shape[0], input_shape[1])
+            x = self.drop3(self.avg_pool3(self.act3(self.bn3(self.conv3_separable(self.drop2(self.avg_pool2(self.act2(self.bn2(self.conv2_depthwise(self.bn1(self.conv1(dummy_input))))))))))))
             self.flattened_size = x.view(-1).size(0)
 
-            # Dropout
-            self.drop = nn.Dropout(0.5)
-
-            self.fc1 = nn.Linear(self.flattened_size, 128)  
+            # Fully connected layer before splitting into arousal and valence
+            self.fc1 = nn.Linear(self.flattened_size, 128)
+            self.act_fc1 = nn.ELU()
 
             # Fully connected layers for arousal and valence
             self.fc_arousal = nn.Linear(128, num_classes)
             self.fc_valence = nn.Linear(128, num_classes)
 
         def forward(self, x):
-            x = self.pool1(F.relu(self.bn1(self.conv1(x))))
-            x = self.pool2(F.relu(self.bn2(self.conv2(x))))
-            x = self.pool3(F.relu(self.bn3(self.conv3(x))))
-            
-            x = x.view(x.size(0), -1)  # Flatten the tensor
-            x = self.drop(F.relu(self.fc1(x)))
+            x = self.bn1(self.conv1(x))
+            x = self.drop2(self.avg_pool2(self.act2(self.bn2(self.conv2_depthwise(x)))))
+            x = self.drop3(self.avg_pool3(self.act3(self.bn3(self.conv3_separable(x)))))
+            x = x.view(x.size(0), -1)
+            x = self.act_fc1(self.fc1(x))
 
             arousal = self.fc_arousal(x)
             valence = self.fc_valence(x)
