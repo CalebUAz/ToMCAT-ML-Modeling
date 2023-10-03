@@ -105,8 +105,8 @@ def load_dataset_NIRS(path):
         combined_df_temp['total_count'] = combined_df_temp.set_index(['subject_id', 'image_path']).index.map(total_counts.to_dict())
 
         # Calculate the start and end of the mid 50 samples for each row
-        combined_df_temp['start_mid'] = (combined_df_temp['total_count'] - 10) / 2
-        combined_df_temp['end_mid'] = combined_df_temp['start_mid'] + 10
+        combined_df_temp['start_mid'] = (combined_df_temp['total_count'] - 70) / 2
+        combined_df_temp['end_mid'] = combined_df_temp['start_mid'] + 70
 
         # Filter rows where cumcount is within the range of mid 50 samples
         mask = (combined_df_temp['cumcount'] >= combined_df_temp['start_mid']) & (combined_df_temp['cumcount'] < combined_df_temp['end_mid'])
@@ -115,7 +115,7 @@ def load_dataset_NIRS(path):
     else:
         # Logic for the first 50 samples
         combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
-        modified_df = combined_df_temp[combined_df_temp['cumcount'] < 10].drop(columns='cumcount')
+        modified_df = combined_df_temp[combined_df_temp['cumcount'] < 70].drop(columns='cumcount')
 
     # Drop the image_path column as per your script
     combined_df = modified_df.drop(columns=['image_path'])
