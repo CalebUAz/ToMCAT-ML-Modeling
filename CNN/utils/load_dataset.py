@@ -88,37 +88,38 @@ def load_dataset_NIRS(path):
     combined_df = combined_df.set_axis(headers, axis=1)
     combined_df = combined_df[columns_to_keep]
 
-    # Subject id for train test split logic
-    combined_df['subject_id'] = np.concatenate([[subject] * len(df) for subject, df in zip(subject_ids, dfs)])
+    # # Subject id for train test split logic
+    # combined_df['subject_id'] = np.concatenate([[subject] * len(df) for subject, df in zip(subject_ids, dfs)])
 
-    combined_df_temp = combined_df.copy()
+    # combined_df_temp = combined_df.copy()
 
-    # Define the switch
-    look_at_mid = True  # Set this to False if you want the first 50 samples
+    # # Define the switch
+    # look_at_mid = True  # Set this to False if you want the first 50 samples
 
-    if look_at_mid:
-        # Calculate cumulative counts
-        combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
+    # if look_at_mid:
+    #     # Calculate cumulative counts
+    #     combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
 
-        # Calculate total counts for each image_path and map it to the DataFrame
-        total_counts = combined_df_temp.groupby(['subject_id', 'image_path']).size()
-        combined_df_temp['total_count'] = combined_df_temp.set_index(['subject_id', 'image_path']).index.map(total_counts.to_dict())
+    #     # Calculate total counts for each image_path and map it to the DataFrame
+    #     total_counts = combined_df_temp.groupby(['subject_id', 'image_path']).size()
+    #     combined_df_temp['total_count'] = combined_df_temp.set_index(['subject_id', 'image_path']).index.map(total_counts.to_dict())
 
-        # Calculate the start and end of the mid 50 samples for each row
-        combined_df_temp['start_mid'] = (combined_df_temp['total_count'] - 70) / 2
-        combined_df_temp['end_mid'] = combined_df_temp['start_mid'] + 70
+    #     # Calculate the start and end of the mid 50 samples for each row
+    #     combined_df_temp['start_mid'] = (combined_df_temp['total_count'] - 70) / 2
+    #     combined_df_temp['end_mid'] = combined_df_temp['start_mid'] + 70
 
-        # Filter rows where cumcount is within the range of mid 50 samples
-        mask = (combined_df_temp['cumcount'] >= combined_df_temp['start_mid']) & (combined_df_temp['cumcount'] < combined_df_temp['end_mid'])
-        modified_df = combined_df_temp[mask].drop(columns=['cumcount', 'total_count', 'start_mid', 'end_mid'])
+    #     # Filter rows where cumcount is within the range of mid 50 samples
+    #     mask = (combined_df_temp['cumcount'] >= combined_df_temp['start_mid']) & (combined_df_temp['cumcount'] < combined_df_temp['end_mid'])
+    #     modified_df = combined_df_temp[mask].drop(columns=['cumcount', 'total_count', 'start_mid', 'end_mid'])
 
-    else:
-        # Logic for the first 50 samples
-        combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
-        modified_df = combined_df_temp[combined_df_temp['cumcount'] < 70].drop(columns='cumcount')
+    # else:
+    #     # Logic for the first 50 samples
+    #     combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
+    #     modified_df = combined_df_temp[combined_df_temp['cumcount'] < 70].drop(columns='cumcount')
 
-    # Drop the image_path column as per your script
-    combined_df = modified_df.drop(columns=['image_path'])
+    # # Drop the image_path column as per your script
+    # combined_df = modified_df.drop(columns=['image_path'])
+    combined_df = combined_df.drop(columns=['image_path'])
 
     return combined_df
 
@@ -201,35 +202,35 @@ def load_dataset_EEG(path):
     combined_df = combined_df[columns_to_keep]
 
     # Subject id for train test split logic
-    combined_df['subject_id'] = np.concatenate([[subject] * len(df) for subject, df in zip(subject_ids, dfs)])
+    # combined_df['subject_id'] = np.concatenate([[subject] * len(df) for subject, df in zip(subject_ids, dfs)])
 
-    combined_df_temp = combined_df.copy()
+    # combined_df_temp = combined_df.copy()
 
-    # Define the switch
-    look_at_mid = True  # Set this to False if you want the first 3000 samples
+    # # Define the switch
+    # look_at_mid = True  # Set this to False if you want the first 3000 samples
 
-    if look_at_mid:
-        # Calculate cumulative counts
-        combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
+    # if look_at_mid:
+    #     # Calculate cumulative counts
+    #     combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
 
-        # Calculate total counts for each image_path and map it to the DataFrame
-        total_counts = combined_df_temp.groupby(['subject_id', 'image_path']).size()
-        combined_df_temp['total_count'] = combined_df_temp.set_index(['subject_id', 'image_path']).index.map(total_counts.to_dict())
+    #     # Calculate total counts for each image_path and map it to the DataFrame
+    #     total_counts = combined_df_temp.groupby(['subject_id', 'image_path']).size()
+    #     combined_df_temp['total_count'] = combined_df_temp.set_index(['subject_id', 'image_path']).index.map(total_counts.to_dict())
 
-        # Calculate the start and end of the mid 3000 samples for each row
-        combined_df_temp['start_mid'] = (combined_df_temp['total_count'] - 3000) / 2
-        combined_df_temp['end_mid'] = combined_df_temp['start_mid'] + 3000
+    #     # Calculate the start and end of the mid 3000 samples for each row
+    #     combined_df_temp['start_mid'] = (combined_df_temp['total_count'] - 3000) / 2
+    #     combined_df_temp['end_mid'] = combined_df_temp['start_mid'] + 3000
 
-        # Filter rows where cumcount is within the range of mid 3000 samples
-        mask = (combined_df_temp['cumcount'] >= combined_df_temp['start_mid']) & (combined_df_temp['cumcount'] < combined_df_temp['end_mid'])
-        modified_df = combined_df_temp[mask].drop(columns=['cumcount', 'total_count', 'start_mid', 'end_mid'])
+    #     # Filter rows where cumcount is within the range of mid 3000 samples
+    #     mask = (combined_df_temp['cumcount'] >= combined_df_temp['start_mid']) & (combined_df_temp['cumcount'] < combined_df_temp['end_mid'])
+    #     modified_df = combined_df_temp[mask].drop(columns=['cumcount', 'total_count', 'start_mid', 'end_mid'])
 
-    else:
-        # Logic for the first 3000 samples
-        combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
-        modified_df = combined_df_temp[combined_df_temp['cumcount'] < 3000].drop(columns='cumcount')
+    # else:
+    #     # Logic for the first 3000 samples
+    #     combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
+    #     modified_df = combined_df_temp[combined_df_temp['cumcount'] < 3000].drop(columns='cumcount')
 
-    # Drop the image_path column as per your script
-    combined_df = modified_df.drop(columns=['image_path'])
-
+    # # Drop the image_path column as per your script
+    # combined_df = modified_df.drop(columns=['image_path'])
+    combined_df.drop(columns=['image_path'])
     return combined_df
