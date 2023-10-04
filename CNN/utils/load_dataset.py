@@ -88,8 +88,8 @@ def load_dataset_NIRS(path):
     combined_df = combined_df.set_axis(headers, axis=1)
     combined_df = combined_df[columns_to_keep]
 
-    # # Subject id for train test split logic
-    # combined_df['subject_id'] = np.concatenate([[subject] * len(df) for subject, df in zip(subject_ids, dfs)])
+    # Subject id for train test split logic
+    combined_df['subject_id'] = np.concatenate([[subject] * len(df) for subject, df in zip(subject_ids, dfs)])
 
     # combined_df_temp = combined_df.copy()
 
@@ -202,7 +202,7 @@ def load_dataset_EEG(path):
     combined_df = combined_df[columns_to_keep]
 
     # Subject id for train test split logic
-    # combined_df['subject_id'] = np.concatenate([[subject] * len(df) for subject, df in zip(subject_ids, dfs)])
+    combined_df['subject_id'] = np.concatenate([[subject] * len(df) for subject, df in zip(subject_ids, dfs)])
 
     # combined_df_temp = combined_df.copy()
 
@@ -232,5 +232,5 @@ def load_dataset_EEG(path):
 
     # # Drop the image_path column as per your script
     # combined_df = modified_df.drop(columns=['image_path'])
-    combined_df.drop(columns=['image_path'])
+
     return combined_df
