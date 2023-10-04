@@ -113,9 +113,15 @@ def load_dataset_NIRS(path):
         modified_df = combined_df_temp[mask].drop(columns=['cumcount', 'total_count', 'start_mid', 'end_mid'])
 
     else:
-        # Logic for the first 50 samples
+        # Offset and length definitions
+        offset = 10
+        length = 50
+        # Calculate cumulative counts
         combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
-        modified_df = combined_df_temp[combined_df_temp['cumcount'] < 50].drop(columns='cumcount')
+
+        # Filter rows where cumcount is within the range after offset
+        mask = (combined_df_temp['cumcount'] >= offset) & (combined_df_temp['cumcount'] < offset + length)
+        modified_df = combined_df_temp[mask].drop(columns='cumcount')
 
     # Drop the image_path column as per your script
     combined_df = modified_df.drop(columns=['image_path'])
