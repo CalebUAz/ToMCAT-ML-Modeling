@@ -1,4 +1,10 @@
 import numpy as np
+from collections import Counter
+
+def chance_accuracy(labels):
+    count = Counter(labels)
+    total = len(labels)
+    return sum((v/total)**2 for v in count.values())
 
 def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_size, model, criterion, optimizer, time, tqdm, Subset, DataLoader, torch):
     # Perform k-fold cross-validation
@@ -6,6 +12,9 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
     fold_accuracies = []
     all_true_arousal, all_pred_arousal = [], []
     all_true_valence, all_pred_valence = [], []
+
+    chance_accuracies_arousal = []
+    chance_accuracies_valence = []
 
     best_loss = float('inf') # Initialize with a high value
     patience_counter = 0 # Counter to keep track of number of epochs with no improvement in loss
@@ -73,6 +82,8 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
         correct_arousal, correct_valence = 0, 0
         total = 0
 
+        fold_true_arousal, fold_true_valence = [], []
+
         with torch.no_grad():
             for inputs, targets in test_loader:
                 inputs = inputs.view(-1, 1, *input_size)
@@ -91,6 +102,8 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
                 all_true_valence.extend(targets_valence.cpu().numpy())
                 all_pred_valence.extend(predicted_valence.cpu().numpy())
 
+                fold_true_arousal.extend(targets_arousal.cpu().numpy())
+                fold_true_valence.extend(targets_valence.cpu().numpy())
 
                 total += targets.size(0)
                 correct_arousal += (predicted_arousal == targets_arousal).sum().item()
@@ -99,6 +112,17 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
         accuracy_arousal = 100 * correct_arousal / total
         accuracy_valence = 100 * correct_valence / total
         fold_accuracies.append((accuracy_arousal, accuracy_valence))
+
+        chance_accuracy_arousal = chance_accuracy(fold_true_arousal) * 100
+        chance_accuracy_valence = chance_accuracy(fold_true_valence) * 100
+        chance_accuracies_arousal.append(chance_accuracy_arousal)
+        chance_accuracies_valence.append(chance_accuracy_valence)
+
+    print("\nChance Accuracies for each fold:")
+    for i, (chance_acc_arousal, chance_acc_valence) in enumerate(zip(chance_accuracies_arousal, chance_accuracies_valence)):
+        print(f"Fold {i+1}:")
+        print(f"  Arousal: {chance_acc_arousal:.2f}%")
+        print(f"  Valence: {chance_acc_valence:.2f}%")
 
     return fold_losses, fold_accuracies, all_true_arousal, all_pred_arousal, all_true_valence, all_pred_valence
 
