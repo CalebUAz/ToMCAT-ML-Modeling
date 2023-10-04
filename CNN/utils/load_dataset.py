@@ -186,7 +186,7 @@ def load_dataset_EEG(path):
                         df.dropna(inplace=True)
                         df.columns = [None] * len(df.columns)
                         
-                        if df.shape[1] > 2:
+                        if df.shape[1] == 26:
                             dfs.append(df)
                             subject_ids.append(folder + '_' + station)
                             count += 1
