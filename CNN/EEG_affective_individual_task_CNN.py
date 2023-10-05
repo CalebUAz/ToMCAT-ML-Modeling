@@ -67,7 +67,7 @@ def classify_CNN_Affective_Individual_Task_EEG(path, hidden_size, num_epochs, ba
         pos = [-2,-1]
         subject_ids = merged_df['subject_id']
         merged_df = merged_df.drop(['subject_id'], axis=1)
-        merged_df = merged_df.drop(['image_path'], axis=1)
+        # merged_df = merged_df.drop(['image_path'], axis=1)
 
     # Check if CUDA is available
     device = torch.device(gpu if torch.cuda.is_available() else "cpu")
