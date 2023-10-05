@@ -86,7 +86,7 @@ def load_dataset_NIRS(path):
     combined_df = pd.concat(dfs, ignore_index=True)
     combined_df = combined_df.drop(columns = ['index'])
     combined_df = combined_df.set_axis(headers, axis=1)
-    combined_df = combined_df[columns_to_keep]
+    # combined_df = combined_df[columns_to_keep]
 
     # Subject id for train test split logic
     combined_df['subject_id'] = np.concatenate([[subject] * len(df) for subject, df in zip(subject_ids, dfs)])
