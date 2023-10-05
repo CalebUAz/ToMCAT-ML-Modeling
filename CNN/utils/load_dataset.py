@@ -114,7 +114,7 @@ def load_dataset_NIRS(path):
 
     else:
         # Offset and length definitions
-        offset = 10
+        offset = 20
         length = 40
         # Calculate cumulative counts
         combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
