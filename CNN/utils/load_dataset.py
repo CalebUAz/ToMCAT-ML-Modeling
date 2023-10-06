@@ -233,7 +233,7 @@ def load_dataset_EEG(path):
 
     else:
         # Offset and length definitions
-        offset = 2000
+        offset = 1500
         length = 500
         # Calculate cumulative counts
         combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
