@@ -24,6 +24,11 @@ from utils import save_plot_with_timestamp, sliding_window, load_dataset_NIRS, s
 
 def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, window_overlap):
 
+    if gpu != "cuda:1":
+        # Set the device to be used for training
+        gpu = "cuda:0"
+
+
     use_wavelet, use_emd = False, False
     
     # Create the output folder if it doesn't exist
@@ -64,7 +69,7 @@ def classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, b
         merged_df = merged_df.drop(['subject_id'], axis=1)
 
     # Check if CUDA is available
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device(gpu if torch.cuda.is_available() else "cpu")
 
     # Preprocess data
     features = merged_df.iloc[:, :pos[0]].values
@@ -240,6 +245,13 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        '--gpu',
+        default="cuda:1",
+        required=False, 
+        type=str,
+        help="cuda:0 or cuda:1")
+
+    parser.add_argument(
         "--window_size", type=int, default=10, help="Use subject holdout for CV"
     )
 
@@ -256,5 +268,6 @@ if __name__ == "__main__":
     subject_holdout = args.subject_holdout
     window_size = args.window_size
     window_overlap = args.window_overlap
+    gpu = args.gpu
 
-    sys.exit(classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, window_overlap))
+    sys.exit(classify_CNN_Affective_Individual_Task_NIRS(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, window_overlap, gpu))
