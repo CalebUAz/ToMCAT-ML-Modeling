@@ -113,8 +113,8 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
         accuracy_valence = 100 * correct_valence / total
         fold_accuracies.append((accuracy_arousal, accuracy_valence))
 
-        chance_accuracy_arousal = chance_accuracy(y_train=fold_true_arousal, y_test=all_true_arousal) * 100
-        chance_accuracy_valence = chance_accuracy(y_train=fold_true_valence, y_test=all_true_valence) * 100
+        chance_accuracy_arousal = chance_accuracy(fold_true_arousal, all_true_arousal) * 100
+        chance_accuracy_valence = chance_accuracy(fold_true_valence, all_true_valence) * 100
         chance_accuracies_arousal.append(chance_accuracy_arousal)
         chance_accuracies_valence.append(chance_accuracy_valence)
 
