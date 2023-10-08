@@ -1,10 +1,10 @@
 import numpy as np
 from collections import Counter
 
-def chance_accuracy(labels):
-    count = Counter(labels)
-    total = len(labels)
-    return sum((v/total)**2 for v in count.values())
+def chance_accuracy(train_labels, test_labels):
+    most_common_class = Counter(train_labels).most_common(1)[0][0]
+    chance_accuracy = sum(1 for y in test_labels if y == most_common_class) / len(test_labels)
+    return chance_accuracy
 
 def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_size, model, criterion, optimizer, time, tqdm, Subset, DataLoader, torch):
     # Perform k-fold cross-validation
@@ -105,6 +105,9 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
                 fold_true_arousal.extend(targets_arousal.cpu().numpy())
                 fold_true_valence.extend(targets_valence.cpu().numpy())
 
+                fold_true_arousal = np.array(fold_true_arousal)
+                fold_true_valence = np.array(fold_true_valence)
+
                 total += targets.size(0)
                 correct_arousal += (predicted_arousal == targets_arousal).sum().item()
                 correct_valence += (predicted_valence == targets_valence).sum().item()
@@ -113,8 +116,8 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
         accuracy_valence = 100 * correct_valence / total
         fold_accuracies.append((accuracy_arousal, accuracy_valence))
 
-        chance_accuracy_arousal = chance_accuracy(fold_true_arousal) * 100
-        chance_accuracy_valence = chance_accuracy(fold_true_valence) * 100
+        chance_accuracy_arousal = chance_accuracy(y_train=fold_true_arousal, y_test=all_true_arousal) * 100
+        chance_accuracy_valence = chance_accuracy(y_train=fold_true_valence, y_test=all_true_valence) * 100
         chance_accuracies_arousal.append(chance_accuracy_arousal)
         chance_accuracies_valence.append(chance_accuracy_valence)
 
