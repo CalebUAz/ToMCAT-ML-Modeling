@@ -102,11 +102,8 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
                 all_true_valence.extend(targets_valence.cpu().numpy())
                 all_pred_valence.extend(predicted_valence.cpu().numpy())
 
-                fold_true_arousal.extend(targets_arousal.cpu().numpy())
-                fold_true_valence.extend(targets_valence.cpu().numpy())
-
-                fold_true_arousal = np.array(fold_true_arousal)
-                fold_true_valence = np.array(fold_true_valence)
+                fold_true_arousal = np.concatenate((fold_true_arousal, targets_arousal.cpu().numpy()))
+                fold_true_valence = np.concatenate((fold_true_valence, targets_valence.cpu().numpy()))
 
                 total += targets.size(0)
                 correct_arousal += (predicted_arousal == targets_arousal).sum().item()
