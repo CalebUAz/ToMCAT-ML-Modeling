@@ -118,11 +118,23 @@ def train_test_split(kfold, dataset, num_folds, num_epochs, batch_size, input_si
         chance_accuracies_arousal.append(chance_accuracy_arousal)
         chance_accuracies_valence.append(chance_accuracy_valence)
 
-    print("\nChance Accuracies for each fold:")
+    print("\Baseline Accuracies for each fold:")
     for i, (chance_acc_arousal, chance_acc_valence) in enumerate(zip(chance_accuracies_arousal, chance_accuracies_valence)):
         print(f"Fold {i+1}:")
         print(f"  Arousal: {chance_acc_arousal:.2f}%")
         print(f"  Valence: {chance_acc_valence:.2f}%")
+
+    # Calculate and print the average chance accuracies using numpy
+    average_chance_accuracy_arousal = np.mean(chance_accuracies_arousal)
+    average_chance_accuracy_valence = np.mean(chance_accuracies_valence)
+
+    # Calculate and print the standard deviation for chance accuracies using numpy
+    stdev_chance_accuracy_arousal = np.std(chance_accuracies_arousal, ddof=1)
+    stdev_chance_accuracy_valence = np.std(chance_accuracies_valence, ddof=1)
+
+    print("\nAverage Baseline accuracy:")
+    print(f"  Arousal: {average_chance_accuracy_arousal:.2f}% (± {stdev_chance_accuracy_arousal:.2f}%)")
+    print(f"  Valence: {average_chance_accuracy_valence:.2f}% (± {stdev_chance_accuracy_valence:.2f}%)")
 
     return fold_losses, fold_accuracies, all_true_arousal, all_pred_arousal, all_true_valence, all_pred_valence
 
