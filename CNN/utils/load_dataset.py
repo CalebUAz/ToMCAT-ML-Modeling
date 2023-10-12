@@ -114,8 +114,8 @@ def load_dataset_NIRS(path):
 
     else:
         # Offset and length definitions
-        offset = 50
-        length = 20
+        offset = 0
+        length = 10
         # Calculate cumulative counts
         combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
 
@@ -234,7 +234,7 @@ def load_dataset_EEG(path):
     else:
         # Offset and length definitions
         offset = 0
-        length = 3000
+        length = 1000
         # Calculate cumulative counts
         combined_df_temp['cumcount'] = combined_df_temp.groupby(['subject_id', 'image_path']).cumcount()
 
