@@ -59,6 +59,7 @@ def classify_CNN_Affective_Individual_Task_EKG(path, hidden_size, num_epochs, ba
         
     # Load dataset
     merged_df = load_dataset_EKG(path)
+    print('merged_df shape:', merged_df.shape)
 
     if subject_holdout:
         pos = [-3,-2] #Subject hold out has an extra column for subject_id. This is the position of the valence and arousal columns

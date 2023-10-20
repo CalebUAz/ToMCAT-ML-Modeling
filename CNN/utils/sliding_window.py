@@ -1,6 +1,7 @@
 import numpy as np
 import mne
-from utils.extract_EEG_features import get_eeg_frequency_band_data, get_ekg_features
+from utils.extract_EEG_features import get_eeg_frequency_band_data
+from utils.extract_EKG_features import get_ekg_features
 
 def sliding_window(signals, valence, arousal, **options):
     """Convert an array of X, Y values into a dataset matrix for and CNN"""
