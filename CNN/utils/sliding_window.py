@@ -2,6 +2,7 @@ import numpy as np
 import mne
 from utils.extract_EEG_features import get_eeg_frequency_band_data
 from utils.extract_EKG_features import get_ekg_features
+from utils.extract_GSR_features import get_gsr_features
 
 def sliding_window(signals, valence, arousal, **options):
     """Convert an array of X, Y values into a dataset matrix for and CNN"""
@@ -29,8 +30,10 @@ def sliding_window_no_overlap(signals, valence, arousal, modality, use_wavelet, 
     if modality == 'eeg':
         # Convert EEG signals to frequency bands
         signals = get_eeg_frequency_band_data(signals, use_wavelet, use_emd)
-    if modality == 'ekg':
+    elif modality == 'ekg':
         signals = get_ekg_features(signals)
+    elif modality == 'gsr':
+        signals = get_gsr_features(signals)
 
     for i in range(0, len(signals) - look_back, look_back):  # Skip by 'look_back' for non-overlapping window
         a = signals[i:(i+look_back)]
@@ -70,8 +73,10 @@ def sliding_window_no_subject_overlap(signals, valence, arousal, subject_id, mod
     if modality == 'eeg':
         # Convert EEG signals to frequency bands
         signals = get_eeg_frequency_band_data(signals, use_wavelet, use_emd)
-    if modality == 'ekg':
+    elif modality == 'ekg':
         signals = get_ekg_features(signals)
+    elif modality == 'gsr':
+        signals = get_gsr_features(signals)
 
     unique_subjects = np.unique(subject_id)
     

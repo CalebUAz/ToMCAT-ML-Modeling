@@ -9,7 +9,7 @@ def get_ekg_features(signals):
     signals, info = nk.ecg_process(ecg_cleaned, sampling_rate=500)
 
     # Dropping the 'raw_ecg' column
-    signals.drop(columns=['ECG_Raw'])
+    signals.drop(columns=['ECG_Raw', 'ECG_Quality'])
     # print('signal shape after dropping RAW:', signals.shape)
     signals.fillna(0, inplace=True)
     # print('signal shape after fill NA:', signals.shape)
