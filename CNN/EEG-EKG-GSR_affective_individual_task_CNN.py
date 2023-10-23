@@ -20,12 +20,19 @@ from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import GroupShuffleSplit
-from utils import save_plot_with_timestamp, sliding_window, load_dataset_GSR, sliding_window_no_overlap, train_test_split, train_test_split, train_test_split_subject_holdout, sliding_window_get_sub_id, is_file_empty_or_nonexistent, sliding_window_no_subject_overlap
+from utils.extract_EEG_features import get_eeg_frequency_band_data
+from utils.extract_EKG_features import get_ekg_features
+from utils.extract_GSR_features import get_gsr_features
+from utils import (save_plot_with_timestamp, sliding_window,            load_dataset_EEG, 
+                   load_dataset_EKG, load_dataset_GSR, sliding_window_no_overlap, 
+                   train_test_split, train_test_split_subject_holdout, 
+                   sliding_window_get_sub_id, is_file_empty_or_nonexistent, 
+                   sliding_window_no_subject_overlap)
 
 
 # os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:27702"
 
-def classify_CNN_Affective_Individual_Task_GSR(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, gpu, use_wavelet, use_emd):
+def classify_CNN_Affective_Individual_Task_EEG_EKG_GSR(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, gpu, use_wavelet, use_emd):
 
     if gpu != "cuda:1":
         # Set the device to be used for training
@@ -58,32 +65,56 @@ def classify_CNN_Affective_Individual_Task_GSR(path, hidden_size, num_epochs, ba
 
         
     # Load dataset
-    merged_df = load_dataset_GSR(path)
+    merged_df_EKG = load_dataset_EKG(path + 'ekg_500hz')
+    merged_df_GSR = load_dataset_GSR(path + 'gsr_500hz')
+    merged_df_EEG = load_dataset_EEG(path + 'eeg_500hz') 
+
+    # Drop the columns from merged_df_EKG and merged_df_GSR
+    columns_to_drop = ['arousal_score', 'valence_score', 'subject_id']
+    merged_df_EKG = merged_df_EKG.drop(columns=columns_to_drop, errors='ignore')  # errors='ignore' ensures it doesn't raise an error if a column is not present
+    merged_df_GSR = merged_df_GSR.drop(columns=columns_to_drop, errors='ignore')
 
     if subject_holdout:
         pos = [-3,-2] #Subject hold out has an extra column for subject_id. This is the position of the valence and arousal columns
         print("Using subject holdout for CV")
     else:
         pos = [-2,-1]
-        subject_ids = merged_df['subject_id']
-        merged_df = merged_df.drop(['subject_id'], axis=1)
+        subject_ids = merged_df_EEG['subject_id']
+        merged_df_EEG = merged_df_EEG.drop(['subject_id'], axis=1)
         # merged_df = merged_df.drop(['image_path'], axis=1)
 
+    EKG_features = merged_df_EKG.iloc[:, 0].values
+    GSR_features = merged_df_GSR.iloc[:, 0].values
+    EEG_features = merged_df_EEG.iloc[:, :pos[0]].values
+
+    EEG_features = get_eeg_frequency_band_data(EEG_features, use_wavelet, use_emd)
+    EKG_features = get_ekg_features(EKG_features)
+    GSR_features = get_gsr_features(GSR_features)
+
+    # Convert them to DataFrames
+    EKG_df = pd.DataFrame(EKG_features)
+    GSR_df = pd.DataFrame(GSR_features)
+    EEG_df = pd.DataFrame(EEG_features)
+
+    # Concatenate them side-by-side
+    merged_df = pd.concat([EKG_df, GSR_df, EEG_df], axis=1)
     # Check if CUDA is available
     device = torch.device(gpu if torch.cuda.is_available() else "cpu")
 
     # Preprocess data
     features = merged_df.iloc[:, :pos[0]].values
-    arousal_score = LabelEncoder().fit_transform(merged_df.iloc[:, pos[0]] + 2)  # Mapping -2 -> 0, -1 -> 1, 0 -> 2, 1 -> 3, 2 -> 4
-    valence_score = LabelEncoder().fit_transform(merged_df.iloc[:, pos[1]] + 2)  # Same mapping for valence_score
+    arousal_score = LabelEncoder().fit_transform(merged_df_EEG.iloc[:, pos[0]] + 2)  # Mapping -2 -> 0, -1 -> 1, 0 -> 2, 1 -> 3, 2 -> 4
+    valence_score = LabelEncoder().fit_transform(merged_df_EEG.iloc[:, pos[1]] + 2)  # Same mapping for valence_score
     print("Arousal score labels:", np.unique(arousal_score), "Valence score labels:", np.unique(valence_score))
     # targets = list(zip(arousal_score, valence_score))
+
+    # Get features from modalities
 
     # Get images from sliding window
     look_back = window_size
     # features, valence, arousal = sliding_window(features, valence_score, arousal_score, look_back=look_back)
-    # features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'ekg', use_wavelet, use_emd, look_back=look_back)
-    features, valence, arousal =  sliding_window_no_subject_overlap(features, valence_score, arousal_score, subject_ids,'ekg', use_wavelet, use_emd, look_back=look_back)
+    # features, valence, arousal =  sliding_window_no_overlap(features, valence_score, arousal_score, 'eeg', use_wavelet, use_emd, look_back=look_back)
+    features, valence, arousal =  sliding_window_no_subject_overlap(features, valence_score, arousal_score, subject_ids,'', use_wavelet, use_emd, look_back=look_back)
     targets = list(zip(valence, arousal))
 
     # Hyperparameters
@@ -192,7 +223,7 @@ def classify_CNN_Affective_Individual_Task_GSR(path, hidden_size, num_epochs, ba
     # Plotting confusion matrix for arousal
     plt.figure(figsize=(20, 14))
     sns.heatmap(arousal_cm, annot=True, fmt='d', xticklabels=class_names, yticklabels=class_names, cmap='Blues', annot_kws={"size": 16})
-    plt.title(f'GSR-CNN: Confusion Matrix for Arousal\nHidden Size: {hidden_size}, Holdout method: {subject_holdout_str} , Window size: {look_back}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {np.mean(arousal_accuracies):.2f}%, std: {np.std(arousal_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
+    plt.title(f'EEG-EKG-GSR-CNN: Confusion Matrix for Arousal\nHidden Size: {hidden_size}, Holdout method: {subject_holdout_str} , Window size: {look_back}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {np.mean(arousal_accuracies):.2f}%, std: {np.std(arousal_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
     plt.xlabel('Predicted')
     plt.ylabel('True')
     confusion_matrix_arousal_file_path = save_plot_with_timestamp(plt, 'confusion_matrix_arousal', output_folder)
@@ -200,7 +231,7 @@ def classify_CNN_Affective_Individual_Task_GSR(path, hidden_size, num_epochs, ba
     # Plotting confusion matrix for valence
     plt.figure(figsize=(20, 14))
     sns.heatmap(valence_cm, annot=True, fmt='d', xticklabels=class_names, yticklabels=class_names, cmap='Blues', annot_kws={"size": 16})
-    plt.title(f'GSR-CNN: Confusion Matrix for Valence\nHidden Size: {hidden_size}, Holdout method: {subject_holdout_str}, Window size: {look_back}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {np.mean(valence_accuracies):.2f}%, std: {np.std(valence_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
+    plt.title(f'EEG-EKG-GSR-CNN: Confusion Matrix for Valence\nHidden Size: {hidden_size}, Holdout method: {subject_holdout_str}, Window size: {look_back}, Batch Size: {batch_size}, Learning Rate: {learning_rate}, Epochs: {num_epochs}, Accuracy: {np.mean(valence_accuracies):.2f}%, std: {np.std(valence_accuracies):.2f}%, loss: {np.mean(fold_losses):.2f}, std: {np.std(fold_losses):.2f}')
     plt.xlabel('Predicted')
     plt.ylabel('True')
     confusion_matrix_valence_file_path = save_plot_with_timestamp(plt, 'confusion_matrix_valence', output_folder)
@@ -209,7 +240,7 @@ def classify_CNN_Affective_Individual_Task_GSR(path, hidden_size, num_epochs, ba
     with open(csv_file_path, 'a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow([
-            time.strftime("%Y-%m-%d %H:%M:%S"), "GSR", subject_holdout_str, hidden_size, num_epochs, 
+            time.strftime("%Y-%m-%d %H:%M:%S"), "EEG-EKG-GSR", subject_holdout_str, hidden_size, num_epochs, 
             batch_size, learning_rate, np.mean(valence_accuracies), np.std(valence_accuracies), 
             np.mean(arousal_accuracies), np.std(arousal_accuracies), np.mean(fold_losses), confusion_matrix_arousal_file_path, confusion_matrix_valence_file_path
         ])
@@ -270,4 +301,4 @@ if __name__ == "__main__":
     use_wavelet = args.use_wavelet
     use_emd = args.use_emd
 
-    sys.exit(classify_CNN_Affective_Individual_Task_GSR(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, gpu, use_wavelet, use_emd))
+    sys.exit(classify_CNN_Affective_Individual_Task_EEG_EKG_GSR(path, hidden_size, num_epochs, batch_size, learning_rate, subject_holdout, window_size, gpu, use_wavelet, use_emd))

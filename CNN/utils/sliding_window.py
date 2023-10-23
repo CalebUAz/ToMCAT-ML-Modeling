@@ -96,3 +96,4 @@ def sliding_window_no_subject_overlap(signals, valence, arousal, subject_id, mod
     dataArousalScore = [np.argmax(np.bincount(x)) for x in dataArousalScore]
 
     return np.array(dataX), np.array(dataValenceScore), np.array(dataArousalScore)
+    
