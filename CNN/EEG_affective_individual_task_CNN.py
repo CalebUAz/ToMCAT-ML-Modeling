@@ -250,7 +250,7 @@ if __name__ == "__main__":
         help="cuda:0 or cuda:1")
     
     parser.add_argument(
-        "--use_wavelet", type=bool, default=False, help="Use wavelet decomposition"
+        "--use_wavelet", type=bool, default=True, help="Use wavelet decomposition"
     )
 
     parser.add_argument(
